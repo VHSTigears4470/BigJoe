@@ -15,4 +15,11 @@ public class IDs {
 
         public static final int PIGEON_ID = 10;
     }
+
+    public static final class ClimbConstants {
+        public static final int INNER_LEFT_ID = 1;
+        public static final int INNER_RIGHT_ID = 2;
+        public static final int OUTER_LEFT_ID = 3;
+        public static final int OUTER_RIGHT_ID = 4;
+    }
 }

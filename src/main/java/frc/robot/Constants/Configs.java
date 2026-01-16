@@ -89,4 +89,29 @@ public final class Configs {
                 .outputRange(-1, 1);
         }
     }
+
+    public static final class Climb {
+        public static final SparkMaxConfig INNER_LEFT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig INNER_RIGHT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig OUTER_LEFT_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig OUTER_RIGHT_CONFIG = new SparkMaxConfig();
+
+        //invert if needed
+        static {
+            INNER_LEFT_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50);
+            INNER_RIGHT_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50)
+                .follow(IDs.ClimbConstants.INNER_LEFT_ID);
+            OUTER_LEFT_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50);
+            OUTER_RIGHT_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50)
+                .follow(IDs.ClimbConstants.OUTER_LEFT_ID);       
+        }
+    }
 }
