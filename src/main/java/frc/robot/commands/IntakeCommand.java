@@ -4,17 +4,16 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.KitbotIntakeSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import static frc.robot.Constants.Intake.IntakeConstants.*;
 
 
 public final class IntakeCommand extends Command {
 
   private final KitbotIntakeSubsystem m_intakeSubsystem;
+
   /** Example static factory for an autonomous command. */
   public IntakeCommand(KitbotIntakeSubsystem intakeSub) {
     this.m_intakeSubsystem = intakeSub;
