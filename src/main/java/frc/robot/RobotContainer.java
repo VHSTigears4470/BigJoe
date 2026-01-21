@@ -33,7 +33,7 @@ public class RobotContainer {
   private DriveSubsystem driveSub;
   private VisionSubsystem visionSub;
 
-  private final CommandXboxController m_driverController =
+  private final CommandXboxController controller =
       new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
   private final SendableChooser<Command> autoChooser;
 
@@ -64,9 +64,9 @@ public class RobotContainer {
       driveSub = new DriveSubsystem(Optional.ofNullable(visionSub));
       driveSub.setDefaultCommand(new RunCommand(
         () -> driveSub.drive(
-                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
+                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
+                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
+                  OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
                   true,
                   "Default / Field Oriented"
         ),
