@@ -9,8 +9,11 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathConstraints;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -76,9 +79,9 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    int preset = 0;
-    switch (preset){ //Add other controller schemes later
-      default: //Main controller scheme
+  int preset = 0;
+    switch (preset) {
+      default:
         if(Operating.Constants.USING_VISION) {
             controller.leftTrigger().whileTrue(new RunCommand(() -> driveSub.driveAligned(
                   OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
@@ -88,9 +91,28 @@ public class RobotContainer {
             ), 
             driveSub));
         }
+
+        if(Operating.Constants.USING_DRIVE) {
+            // 1. Define the target and constraints
+            Pose2d targetPose = new Pose2d(10, 5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
+            
+            PathConstraints constraints = new PathConstraints(
+                3.0, 4.0,
+                Units.degreesToRadians(540), 
+                Units.degreesToRadians(720));
+
+            // 2. Bind to a button (e.g., the B button)
+            controller.b().whileTrue(
+                AutoBuilder.pathfindToPose(
+                    targetPose,
+                    constraints,
+                    0.0 // Goal end velocity
+                )
+            );
+        }
         break;
     }    
-  }
+}
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
