@@ -44,10 +44,4 @@ public class RobotContainer {
       controller.y().whileTrue(new RunCommand(
         () -> shootSub.shooting(), intakeSub));
   }
-
-  public void configurePathPlanner() {
-    return;
-  }
-
-  
 }
