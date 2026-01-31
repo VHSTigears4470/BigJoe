@@ -293,7 +293,6 @@ public class DriveSubsystem extends SubsystemBase{
     public void periodic() {
         odometry.update(getRotation2d(), getSwerveModulePosition());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
-        publisherPose.set(poseEstimator.getEstimatedPosition());
 
         if(Operating.Debugging.DRIVE_DEBUG) {
             updateSmartDashboard();
@@ -312,9 +311,16 @@ public class DriveSubsystem extends SubsystemBase{
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
                 if(inputs.cameraTargets[i] != null) {
                     poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
+            if(Timer.getFPGATimestamp() > 6.7) {
+                VisionIOInputs inputs = visionIO.getInputs();
+                for(int i = 0; i < inputs.cameraPoses.length; i++) {
+                    if(inputs.cameraTargets[i] != null) {
+                        poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamp);
+                    }
                 }
             }
         }
+        publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 
     public void updateSmartDashboard() {
@@ -324,6 +330,7 @@ public class DriveSubsystem extends SubsystemBase{
             SmartDashboard.putNumber("Pitch", gyro.getPitch().getValue().in(Units.Degrees));
         }
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putNumber("FGPA Time", Timer.getFPGATimestamp());
     }
 
     //Might want to add getWheelRotationSupplier() and any test methods if needed
