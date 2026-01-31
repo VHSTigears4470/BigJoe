@@ -6,7 +6,6 @@ package frc.robot;
 
 import frc.robot.Constants.*;
 import frc.robot.subsystems.*;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
@@ -15,12 +14,10 @@ public class RobotContainer {
   private final CommandXboxController controller =
       new CommandXboxController(Shared.OperatorConstants.DRIVER_CONTROLLER_PORT);
   
-  private DriveSubsystem driveSub;
   private KitbotIntakeSubsystem intakeSub;
   private KitbotShootingSubsystem shootSub;
 
   public RobotContainer() {
-    driveSub = new DriveSubsystem();
     intakeSub = new KitbotIntakeSubsystem();
     shootSub = new KitbotShootingSubsystem();
      
@@ -28,19 +25,15 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-      driveSub.setDefaultCommand(new RunCommand(
-        () -> driveSub.drive(
-                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND), 
-                  true,
-                  "Default / Field Oriented"
-        ),
-        driveSub));  
-      controller.a().whileTrue(new RunCommand(
-        () -> intakeSub.intake(), intakeSub));
+      intakeSub.setDefaultCommand(new RunCommand(
+        () -> intakeSub.stopIntake(), intakeSub));
+      shootSub.setDefaultCommand(new RunCommand(
+        () -> shootSub.stopMotors(), shootSub));
+      
       controller.b().whileTrue(new RunCommand(
-        () -> intakeSub.reverse(), intakeSub));
+        () -> intakeSub.intake(), intakeSub));
+      controller.a().whileTrue(new RunCommand(
+        () -> intakeSub.setFeederRoller(1), intakeSub));
       controller.y().whileTrue(new RunCommand(
         () -> shootSub.shooting(), intakeSub));
   }
