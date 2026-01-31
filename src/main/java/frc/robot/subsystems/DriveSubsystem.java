@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -319,4 +321,28 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     //Might want to add getWheelRotationSupplier() and any test methods if needed
+
+    @Override
+    public void simulationPeriodic() {
+        var moduleStates = new SwerveModuleState[] {
+            frontLeft.getState(),
+            frontRight.getState(),
+            backLeft.getState(),
+            backRight.getState()
+        };
+
+        var chassisSpeeds = Drive.Constants.DRIVE_KINEMATICS.toChassisSpeeds(moduleStates);
+        
+        if (gyro != null) {
+            double loopTime = 0.02; // 20ms standard loop
+            double currentOmegaRadPerSec = chassisSpeeds.omegaRadiansPerSecond;
+            double degreesChange = Math.toDegrees(currentOmegaRadPerSec * loopTime);
+            
+            gyro.getSimState().addYaw(degreesChange);
+        }
+
+        // record to akit?
+        Logger.recordOutput("Odometry/RobotPose", getOdometry());
+        Logger.recordOutput("Odometry/ModuleStates", moduleStates);
+    }
 }

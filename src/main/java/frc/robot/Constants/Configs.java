@@ -12,12 +12,21 @@ public final class Configs {
         public static final SparkMaxConfig FR_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BR_CONFIG = new SparkMaxConfig();
+        public static final double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS; // aka kV
+        
+        // FIXME: UPDATE FOR SIM!
+        public static final double FF_ACCELERATION = 0.23; // aka kA
+
+        public static final int DRIVE_GEAR_RATIO = 3;
+        public static final int TURN_GEAR_RATIO = 3;
+        public static final double MAX_LINEAR_SPEED = 4.5; // m/s
+        public static final int DRIVE_MOTOR_COUNT = 1; // 1 NEO motor
+        public static final int TURN_MOTOR_COUNT = 1; // 1 NEO motor
 
         static {
             //Module constants used to calculate conversion factors and feed forward gain.
             double DRIVING_FACTOR = Drive.ModuleConstants.WHEEL_DIAMETER * Math.PI
                 / Drive.ModuleConstants.DRIVE_MOTOR_REDUCTION;
-            double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS;
             double TURNING_FACTOR = 2 * Math.PI;
 
             //Update as needed
