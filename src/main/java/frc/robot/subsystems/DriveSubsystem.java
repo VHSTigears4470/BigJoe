@@ -307,6 +307,10 @@ public class DriveSubsystem extends SubsystemBase{
             backRight.updateSmartDashboard();
         }
         if(Operating.Constants.USING_VISION) {
+            VisionIOInputs inputs = visionIO.getInputs();
+            for(int i = 0; i < inputs.cameraPoses.length; i++) {
+                if(inputs.cameraTargets[i] != null) {
+                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
             if(Timer.getFPGATimestamp() > 6.7) {
                 VisionIOInputs inputs = visionIO.getInputs();
                 for(int i = 0; i < inputs.cameraPoses.length; i++) {
