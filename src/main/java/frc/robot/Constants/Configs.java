@@ -15,18 +15,30 @@ public final class Configs {
         public static final double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS; 
         
         public static final class Sim {
-            public static final double VOLTS_PER_VELOCITY = 1.0 / 4.5; // Volts per (meter per second) - kV
-            public static final double VOLTS_PER_ACCELERATION = 0.23; // Volts per (meter per second squared) - kA
-            public static final int DRIVE_GEAR_RATIO = 3;
-            public static final int TURN_GEAR_RATIO = 3;
-            public static final double MAX_LINEAR_SPEED = 4.5; // m/s
-            public static final int DRIVE_MOTOR_COUNT = 1; // 1 NEO motor
-            public static final int TURN_MOTOR_COUNT = 1; // 1 NEO motor
+            // NEO motor simulation constants based on actual hardware specs
+            // NEO free speed: 5676 RPM, Stall torque: 3.36 N⋅m @ 12V, Stall current: 166A
 
-            public static final double TURN_SIM_PID_P = 8.0;
+            // kV = nominal_voltage / max_linear_speed = 12V / 4.46 m/s
+            public static final double VOLTS_PER_VELOCITY = 12.0 / Drive.Constants.MAX_METERS_PER_SECOND; // ~2.69 V/(m/s)
+
+            // kA calculated from NEO stall torque, gear ratio, wheel radius, and estimated robot mass
+            // With 4 drive motors, stall force ~1791N, mass ~50kg gives ~35.8 m/s² theoretical max
+            // Practical kA accounts for friction, mass distribution: 12V / practical_accel
+            public static final double VOLTS_PER_ACCELERATION = 0.27; // V/(m/s²)
+
+            // Actual MAXSwerve gear ratios
+            public static final double DRIVE_GEAR_RATIO = Drive.ModuleConstants.DRIVE_MOTOR_REDUCTION; // ~5.077:1
+            public static final double TURN_GEAR_RATIO = 46.42; // MAXSwerve steering reduction (150/7 * 10/1 worm)
+
+            public static final double MAX_LINEAR_SPEED = Drive.Constants.MAX_METERS_PER_SECOND; // 4.46 m/s
+            public static final int DRIVE_MOTOR_COUNT = 1; // 1 NEO motor per module
+            public static final int TURN_MOTOR_COUNT = 1; // 1 NEO motor per steering
+
+            // Simulation PID values match actual hardware configuration
+            public static final double TURN_SIM_PID_P = 1.0;  // Matches TURNING_CONFIG.pid
             public static final double TURN_SIM_PID_I = 0.0;
             public static final double TURN_SIM_PID_D = 0.0;
-            public static final double DRIVE_SIM_PID_P = 2.0;  
+            public static final double DRIVE_SIM_PID_P = 0.04; // Matches drive configs.pid
             public static final double DRIVE_SIM_PID_I = 0.0;
             public static final double DRIVE_SIM_PID_D = 0.0;
 
