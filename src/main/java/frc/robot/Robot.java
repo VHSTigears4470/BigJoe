@@ -29,17 +29,28 @@ public class Robot extends LoggedRobot  {
    * initialization code.
    */
   public Robot() {
-
     Logger.recordMetadata("ProjectName", "BigJoe"); // Set a metadata value
+    Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
 
     if (isReal()) { 
       Logger.addDataReceiver(new WPILOGWriter()); // Log to a USB stick ("/U/logs")
-      Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
     } else {
       setUseTiming(false); // Run as fast as possible
-      String logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
-      Logger.setReplaySource(new WPILOGReader(logPath)); // Read replay log
-      Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim"))); // Save outputs to a new log
+      String logPath = null;
+      try {
+        logPath = LogFileUtil.findReplayLog(); // Pull the replay log from AdvantageScope (or prompt the user)
+      } catch(Exception e)
+      {
+        // swallow all exceptions, use if statement below
+      }
+      if (logPath != null && !logPath.isEmpty()) {
+        // Replay mode
+        Logger.setReplaySource(new WPILOGReader(logPath));
+        Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
+      } else {
+        // Fresh simulation
+        Logger.addDataReceiver(new WPILOGWriter("logs"));
+      }
     }
 
     Logger.start(); // Start logging! No more data receivers, replay sources, or metadata values may be added.

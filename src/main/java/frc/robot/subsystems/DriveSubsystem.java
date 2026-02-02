@@ -59,15 +59,9 @@ public class DriveSubsystem extends SubsystemBase{
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
  
-    SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-        Drive.Constants.DRIVE_KINEMATICS,
-        getRotation2d(),
-        getSwerveModulePosition());
-
+    SwerveDriveOdometry odometry = null;
     private VisionSubsystem visionIO = null;
-    private SwerveDrivePoseEstimator poseEstimator =
-        new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
-            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+    private SwerveDrivePoseEstimator poseEstimator = null;
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
@@ -110,6 +104,14 @@ public class DriveSubsystem extends SubsystemBase{
                     Configs.SwerveModule.TURNING_CONFIG),
                  MotorLocation.BACK_RIGHT);
         }
+
+        odometry = new SwerveDriveOdometry(
+            Drive.Constants.DRIVE_KINEMATICS,
+            getRotation2d(),
+            getSwerveModulePosition());
+        poseEstimator = new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
+            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+
 
         if(photonVision.isEmpty()) {
             visionIO = new VisionSubsystem();
