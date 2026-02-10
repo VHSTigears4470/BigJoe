@@ -116,6 +116,18 @@ public class SwerveModule extends SubsystemBase {
     return turnEncoder.getVelocity();
   }
 
+  public double getOutputCurrent() {
+    return driveMotor.getOutputCurrent();
+  }
+
+  public double getMotorTemperature() {
+    return driveMotor.getMotorTemperature();
+  }
+
+  public double getAbsoluteEncoderPosition() {
+    return turnEncoder.getPosition();
+  }
+
   //Zeroes the module's encoders.
   public void resetEncoders() {
     driveEncoder.setPosition(0);

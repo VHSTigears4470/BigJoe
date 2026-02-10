@@ -2,6 +2,10 @@ package frc.robot.subsystems;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -26,6 +30,7 @@ import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -89,6 +94,11 @@ public class DriveSubsystem extends SubsystemBase{
     private SwerveDrivePoseEstimator poseEstimator =
         new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
             Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+    // Timestamp used to throttle match-time logging
+    private double lastMatchLog = 0.0;
+    // Track last-known enable states so we only log on changes
+    private boolean lastTeleopEnabled = false;
+    private boolean lastAutonomousEnabled = false;
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
@@ -291,6 +301,99 @@ public class DriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        //Logging Drive Outputs
+        Logger.recordOutput("Drive/Pose", poseEstimator.getEstimatedPosition());
+        Logger.recordOutput("Drive/Pose/X", poseEstimator.getEstimatedPosition().getX());
+        Logger.recordOutput("Drive/Pose/Y", poseEstimator.getEstimatedPosition().getY());
+        Logger.recordOutput("Drive/Pose/Rotation", poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+
+        if (Operating.Constants.USING_GYRO) {
+            Logger.recordOutput("Drive/Gyro/Yaw", gyro.getYaw().getValue());
+            Logger.recordOutput("Drive/Gyro/Pitch", gyro.getPitch().getValue());
+            Logger.recordOutput("Drive/Gyro/Roll", gyro.getRoll().getValue());
+        }
+
+        Logger.recordOutput("Drive/ModuleStates/Desired", desiredStates);
+        Logger.recordOutput("Drive/ModuleStates/Actual", getSwerveModuleState());
+
+        //Logging Swerve Module Drive Outputs:
+        //Drive Velocity
+        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Velocity", frontLeft.getDriveVelocity());
+        Logger.recordOutput("Drive/DriverMotor/FrontRight/Velocity", frontRight.getDriveVelocity());
+        Logger.recordOutput("Drive/DriverMotor/BackLeft/Velocity", backLeft.getDriveVelocity());
+        Logger.recordOutput("Drive/DriverMotor/BackRight/Velocity", backRight.getDriveVelocity());
+
+        //Drive Position
+        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Position", frontLeft.getDrivePosition());
+        Logger.recordOutput("Drive/DriverMotor/FrontRight/Position", frontRight.getDrivePosition());
+        Logger.recordOutput("Drive/DriverMotor/BackLeft/Position", backLeft.getDrivePosition());
+        Logger.recordOutput("Drive/DriverMotor/BackRight/Position", backRight.getDrivePosition());
+
+        //Drive Current
+        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Current", frontLeft.getOutputCurrent());
+        Logger.recordOutput("Drive/DriverMotor/FrontRight/Current", frontRight.getOutputCurrent());
+        Logger.recordOutput("Drive/DriverMotor/BackLeft/Current", backLeft.getOutputCurrent());
+        Logger.recordOutput("Drive/DriverMotor/BackRight/Current", backRight.getOutputCurrent());
+
+        //Drive Temperature
+        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Temperature", frontLeft.getMotorTemperature());
+        Logger.recordOutput("Drive/DriverMotor/FrontRight/Temperature", frontRight.getMotorTemperature());
+        Logger.recordOutput("Drive/DriverMotor/BackLeft/Temperature", backLeft.getMotorTemperature());
+        Logger.recordOutput("Drive/DriverMotor/BackRight/Temperature", backRight.getMotorTemperature());
+
+        //Logging Swerve Module Drive Outputs:
+        //Turn Velocity
+        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Velocity", frontLeft.getTurnVelocity());
+        Logger.recordOutput("Drive/TurnMotor/FrontRight/Velocity", frontRight.getTurnVelocity());
+        Logger.recordOutput("Drive/TurnMotor/BackLeft/Velocity", backLeft.getTurnVelocity());
+        Logger.recordOutput("Drive/TurnMotor/BackRight/Velocity", backRight.getTurnVelocity());
+
+        //Turn Position
+        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Position", frontLeft.getTurnPosition());
+        Logger.recordOutput("Drive/TurnMotor/FrontRight/Position", frontRight.getTurnPosition());
+        Logger.recordOutput("Drive/TurnMotor/BackLeft/Position", backLeft.getTurnPosition());
+        Logger.recordOutput("Drive/TurnMotor/BackRight/Position", backRight.getTurnPosition());
+
+        //Turn Current
+        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Current", frontLeft.getOutputCurrent());
+        Logger.recordOutput("Drive/TurnMotor/FrontRight/Current", frontRight.getOutputCurrent());
+        Logger.recordOutput("Drive/TurnMotor/BackLeft/Current", backLeft.getOutputCurrent());
+        Logger.recordOutput("Drive/TurnMotor/BackRight/Current", backRight.getOutputCurrent());
+
+        //Turn Temperature
+        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Temperature", frontLeft.getMotorTemperature());
+        Logger.recordOutput("Drive/TurnMotor/FrontRight/Temperature", frontRight.getMotorTemperature());
+        Logger.recordOutput("Drive/TurnMotor/BackLeft/Temperature", backLeft.getMotorTemperature());
+        Logger.recordOutput("Drive/TurnMotor/BackRight/Temperature", backRight.getMotorTemperature());
+
+        //Logging Swerve Module Absolute Encoder Values:
+        Logger.recordOutput("Drive/AbsoluteEncoder/FrontLeft/Position", frontLeft.getAbsoluteEncoderPosition());
+        Logger.recordOutput("Drive/AbsoluteEncoder/FrontRight/Position", frontRight.getAbsoluteEncoderPosition());
+        Logger.recordOutput("Drive/AbsoluteEncoder/BackLeft/Position", backLeft.getAbsoluteEncoderPosition());
+        Logger.recordOutput("Drive/AbsoluteEncoder/BackRight/Position", backRight.getAbsoluteEncoderPosition());
+
+        //Logging Battery Voltage
+        Logger.recordOutput("Power/BatteryVoltage", RobotController.getBatteryVoltage());
+
+        //Logging Match Time (throttled)
+        double now = Timer.getFPGATimestamp();
+        if (now - lastMatchLog > 0.2) {
+            lastMatchLog = now;
+            Logger.recordOutput("Match/TimeRemaining", DriverStation.getMatchTime());
+        }
+
+        // Log teleop/autonomous enable state on changes
+        boolean teleop = DriverStation.isTeleopEnabled();
+        boolean auton = DriverStation.isAutonomousEnabled();
+        if (teleop != lastTeleopEnabled || auton != lastAutonomousEnabled) {
+            lastTeleopEnabled = teleop;
+            lastAutonomousEnabled = auton;
+            Logger.recordOutput("Match/TeleopEnabled", teleop);
+            Logger.recordOutput("Match/AutonomousEnabled", auton);
+            String mode = auton ? "Autonomous" : teleop ? "Teleop" : "Disabled";
+            Logger.recordOutput("Match/Mode", mode);
+        }
+
         odometry.update(getRotation2d(), getSwerveModulePosition());
         poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
 
@@ -314,6 +417,7 @@ public class DriveSubsystem extends SubsystemBase{
                 }
             }
         }
+        
         publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 
