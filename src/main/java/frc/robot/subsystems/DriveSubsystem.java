@@ -57,6 +57,8 @@ public class DriveSubsystem extends SubsystemBase{
     private SwerveModuleState desiredStates[] = {new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
     private StructArrayPublisher<SwerveModuleState> publisherDesieredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
+    private StructArrayPublisher<SwerveModulePosition> publisherPositions = NetworkTableInstance.getDefault().getStructArrayTopic("MyPositions", SwerveModulePosition.struct).publish();
+
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
  
     SwerveDriveOdometry odometry = null;
@@ -248,12 +250,17 @@ public class DriveSubsystem extends SubsystemBase{
    }
 
     //Resets odometry to the specified pose.
-    public void resetOdometry(Pose2d p_pose) {
+    public void resetOdometry(Pose2d pose) {
         odometry.resetPosition(
             getRotation2d(),
             getSwerveModulePosition(),
-            p_pose);
+            pose);
     }
+
+     public void resetPose(Pose2d pose) {
+        poseEstimator.resetPose(pose);
+    }
+
 
     //Resests drive encoders to read a position of 0.
     public void resetEncoders() {
@@ -308,23 +315,24 @@ public class DriveSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         odometry.update(getRotation2d(), getSwerveModulePosition());
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
 
         if(Operating.Debugging.DRIVE_DEBUG) {
             updateSmartDashboard();
             //updateWheelPositions - add for extra debugging functionality
             publisherDesieredStates.set(desiredStates);
             publisherActualStates.set(getSwerveModuleState());
+            publisherPositions.set(getSwerveModulePosition());
         }
         if(Operating.Constants.USING_VISION) {
-            poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
             VisionIOInputs inputs = visionIO.getInputs();
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
                 if(inputs.cameraTargets[i] != null) {
-                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), Timer.getFPGATimestamp());
+                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
                 }
             }
-            publisherPose.set(poseEstimator.getEstimatedPosition());
         }
+        publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 
     public void updateSmartDashboard() {
@@ -334,6 +342,7 @@ public class DriveSubsystem extends SubsystemBase{
             SmartDashboard.putNumber("Pitch", gyro.getPitch().getValue().in(Units.Degrees));
         }
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putNumber("FGPA Time", Timer.getFPGATimestamp());
     }
 
     //Might want to add getWheelRotationSupplier() and any test methods if needed
