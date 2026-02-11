@@ -12,8 +12,7 @@ public final class Configs {
         public static final SparkMaxConfig FR_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig BR_CONFIG = new SparkMaxConfig();
-        public static final double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS; 
-        
+      
         public static final class Sim {
             // NEO motor simulation constants based on actual hardware specs
             // NEO free speed: 5676 RPM, Stall torque: 3.36 N⋅m @ 12V, Stall current: 166A
@@ -59,6 +58,7 @@ public final class Configs {
             //Module constants used to calculate conversion factors and feed forward gain.
             double DRIVING_FACTOR = Drive.ModuleConstants.WHEEL_DIAMETER * Math.PI
                 / Drive.ModuleConstants.DRIVE_MOTOR_REDUCTION;
+            double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS;
             double TURNING_FACTOR = 2 * Math.PI;
 
             //Update as needed
@@ -153,6 +153,32 @@ public final class Configs {
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
                 .follow(IDs.ClimbConstants.OUTER_LEFT_ID);       
+        }
+    }
+
+    public static final class Shooter {
+        public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
+
+        //invert if needed
+        static {
+            double FLYWHEEL_FACTOR = 1; //change/delete?
+
+            FLYWHEEL_CONFIG
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(50)
+                .inverted(false); 
+           
+          //  FLYWHEEL_CONFIG.encoder
+          //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
+          //      .velocityConversionFactor(FLYWHEEL_FACTOR / 60.0);
+
+            FLYWHEEL_CONFIG.closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .pid(0.001, 0, 0.0001)
+                .outputRange(-1, 1)
+            .maxMotion
+                // Set MAXMotion parameters for position control - Edit
+                .allowedProfileError(100);
         }
     }
 }
