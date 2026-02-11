@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import frc.robot.Constants.Configs;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.Drive.Constants.MotorLocation;
@@ -41,40 +42,18 @@ import frc.robot.Constants.IDs;
 import frc.robot.Constants.Operating;
 import frc.robot.Constants.Vision;
 import frc.robot.Constants.Vision.VisionIOInputs;
+import frc.robot.components.SwerveModule;
+import frc.robot.components.SwerveModuleIO;
+import frc.robot.components.SwerveModuleIOSim;
+import frc.robot.components.SwerveModuleIOSparkMax;
+import frc.robot.components.SwerveModuleIOReplay;
 
 public class DriveSubsystem extends SubsystemBase{
     //Creates Swerve Modules
-     private final SwerveModule frontLeft = new SwerveModule(
-        IDs.DriveConstants.FL_DRIVE_ID,
-        IDs.DriveConstants.FL_TURN_ID,
-        Drive.Constants.FL_ANGULAR_OFFSET,
-        Drive.Constants.FL_INVERTED,
-        Configs.SwerveModule.FL_CONFIG,
-        MotorLocation.FRONT_LEFT);
-
-    private final SwerveModule backLeft = new SwerveModule(
-        IDs.DriveConstants.BL_DRIVE_ID,
-        IDs.DriveConstants.BL_TURN_ID,
-        Drive.Constants.BL_ANGULAR_OFFSET,
-        Drive.Constants.BL_INVERTED,
-        Configs.SwerveModule.BL_CONFIG,
-        MotorLocation.BACK_LEFT);
-
-    private final SwerveModule frontRight = new SwerveModule(
-        IDs.DriveConstants.FR_DRIVE_ID,
-        IDs.DriveConstants.FR_TURN_ID,
-        Drive.Constants.FR_ANGULAR_OFFSET,
-        Drive.Constants.FR_INVERTED,
-        Configs.SwerveModule.FR_CONFIG,
-        MotorLocation.FRONT_RIGHT);
-
-    private final SwerveModule backRight = new SwerveModule(
-        IDs.DriveConstants.BR_DRIVE_ID,
-        IDs.DriveConstants.BR_TURN_ID,
-        Drive.Constants.BR_ANGULAR_OFFSET,
-        Drive.Constants.BR_INVERTED,
-        Configs.SwerveModule.BR_CONFIG,
-        MotorLocation.BACK_RIGHT);
+    private SwerveModule frontLeft = null;
+    private SwerveModule frontRight = null;
+    private SwerveModule backLeft = null;  
+    private SwerveModule backRight = null;
 
     private final Pigeon2 gyro = Operating.Constants.USING_GYRO ? new Pigeon2(IDs.DriveConstants.PIGEON_ID) : null;
 
@@ -85,20 +64,9 @@ public class DriveSubsystem extends SubsystemBase{
 
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
  
-    SwerveDriveOdometry odometry = new SwerveDriveOdometry(
-        Drive.Constants.DRIVE_KINEMATICS,
-        getRotation2d(),
-        getSwerveModulePosition());
-
+    SwerveDriveOdometry odometry = null;
     private VisionSubsystem visionIO = null;
-    private SwerveDrivePoseEstimator poseEstimator =
-        new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
-            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
-    // Timestamp used to throttle match-time logging
-    private double lastMatchLog = 0.0;
-    // Track last-known enable states so we only log on changes
-    private boolean lastTeleopEnabled = false;
-    private boolean lastAutonomousEnabled = false;
+    private SwerveDrivePoseEstimator poseEstimator = null;
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
@@ -110,7 +78,7 @@ public class DriveSubsystem extends SubsystemBase{
         
         //Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-        RobotConfig config;
+        RobotConfig config = null;
 
         try {
             config = RobotConfig.fromGUISettings();
@@ -251,10 +219,10 @@ public class DriveSubsystem extends SubsystemBase{
 
     //Resests drive encoders to read a position of 0.
     public void resetEncoders() {
-        frontLeft.resetEncoders();
-        frontRight.resetEncoders();
-        backLeft.resetEncoders();
-        backRight.resetEncoders();
+        frontLeft.resetDriveEncoder();
+        frontRight.resetDriveEncoder();
+        backLeft.resetDriveEncoder();
+        backRight.resetDriveEncoder();
     }
 
     //Zereos the heading of the robot.
@@ -403,11 +371,6 @@ public class DriveSubsystem extends SubsystemBase{
             publisherDesieredStates.set(desiredStates);
             publisherActualStates.set(getSwerveModuleState());
             publisherPositions.set(getSwerveModulePosition());
-
-            frontLeft.updateSmartDashboard();
-            frontRight.updateSmartDashboard();
-            backLeft.updateSmartDashboard();
-            backRight.updateSmartDashboard();
         }
         if(Operating.Constants.USING_VISION) {
             VisionIOInputs inputs = visionIO.getInputs();
@@ -421,8 +384,6 @@ public class DriveSubsystem extends SubsystemBase{
         publisherPose.set(poseEstimator.getEstimatedPosition());
     }
 
-
-
     public void updateSmartDashboard() {
         SmartDashboard.putNumber("Robot Heading Yaw", getRotation2d().getDegrees());
         if(Operating.Constants.USING_GYRO) {
@@ -434,4 +395,28 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     //Might want to add getWheelRotationSupplier() and any test methods if needed
+
+    @Override
+    public void simulationPeriodic() {
+        var moduleStates = new SwerveModuleState[] {
+            frontLeft.getState(),
+            frontRight.getState(),
+            backLeft.getState(),
+            backRight.getState()
+        };
+
+        var chassisSpeeds = Drive.Constants.DRIVE_KINEMATICS.toChassisSpeeds(moduleStates);
+        
+        if (gyro != null) {
+            double loopTime = 0.02; // 20ms standard loop
+            double currentOmegaRadPerSec = chassisSpeeds.omegaRadiansPerSecond;
+            double degreesChange = Math.toDegrees(currentOmegaRadPerSec * loopTime);
+            
+            gyro.getSimState().addYaw(degreesChange);
+        }
+
+        // record to akit?
+        Logger.recordOutput("Odometry/RobotPose", getOdometry());
+        Logger.recordOutput("Odometry/ModuleStates", moduleStates);
+    }
 }
