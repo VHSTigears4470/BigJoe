@@ -73,6 +73,53 @@ public class DriveSubsystem extends SubsystemBase{
 
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
+        if(Robot.isSimulation())
+        {
+            frontLeft = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.FL_ANGULAR_OFFSET), MotorLocation.FRONT_LEFT);
+            frontRight = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.FR_ANGULAR_OFFSET), MotorLocation.FRONT_RIGHT);
+            backLeft = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.BL_ANGULAR_OFFSET), MotorLocation.BACK_LEFT);
+            backRight = new SwerveModule(new SwerveModuleIOSim(Drive.Constants.BR_ANGULAR_OFFSET), MotorLocation.BACK_RIGHT);
+        }
+        else
+        {
+            frontLeft = new SwerveModule(
+                new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.FL_DRIVE_ID,
+                    IDs.DriveConstants.FL_TURN_ID,
+                    Drive.Constants.FL_ANGULAR_OFFSET,
+                    Configs.SwerveModule.FL_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.FRONT_LEFT);
+            frontRight = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.FR_DRIVE_ID,
+                    IDs.DriveConstants.FR_TURN_ID,
+                    Drive.Constants.FR_ANGULAR_OFFSET,
+                    Configs.SwerveModule.FR_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.FRONT_RIGHT);
+            backLeft = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.BL_DRIVE_ID,
+                    IDs.DriveConstants.BL_TURN_ID,
+                    Drive.Constants.BL_ANGULAR_OFFSET,
+                    Configs.SwerveModule.BL_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                MotorLocation.BACK_LEFT);
+            backRight = new SwerveModule(new SwerveModuleIOSparkMax(
+                    IDs.DriveConstants.BR_DRIVE_ID,
+                    IDs.DriveConstants.BR_TURN_ID,
+                    Drive.Constants.BR_ANGULAR_OFFSET,
+                    Configs.SwerveModule.BR_CONFIG,
+                    Configs.SwerveModule.TURNING_CONFIG),
+                 MotorLocation.BACK_RIGHT);
+        }
+
+        odometry = new SwerveDriveOdometry(
+            Drive.Constants.DRIVE_KINEMATICS,
+            getRotation2d(),
+            getSwerveModulePosition());
+        poseEstimator = new SwerveDrivePoseEstimator(Drive.Constants.DRIVE_KINEMATICS, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
+            Vision.Constants.SINGLE_STD_DEVS, Vision.Constants.SINGLE_STD_DEVS);
+
         if(photonVision.isEmpty()) {
             visionIO = new VisionSubsystem();
         } else {
