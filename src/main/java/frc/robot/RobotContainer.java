@@ -4,53 +4,37 @@
 
 package frc.robot;
 
-import frc.robot.Constants.shared;
-import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.*;
+import frc.robot.subsystems.*;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.IntakeCommand;
-
-
-
-
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
-
-
 
 public class RobotContainer {
 
-  private final CommandXboxController driverController =
-      new CommandXboxController(shared.OperatorConstants.DRIVER_CONTROLLER_PART);
+  private final CommandXboxController controller =
+      new CommandXboxController(Shared.OperatorConstants.DRIVER_CONTROLLER_PORT);
+  
+  private KitbotIntakeSubsystem intakeSub;
+  private KitbotShootingSubsystem shootSub;
 
   public RobotContainer() {
+    intakeSub = new KitbotIntakeSubsystem();
+    shootSub = new KitbotShootingSubsystem();
+     
     configureBindings();
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
-   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-
   private void configureBindings() {
-    controllerPresetMain();
+      intakeSub.setDefaultCommand(new RunCommand(
+        () -> intakeSub.stopIntake(), intakeSub));
+      shootSub.setDefaultCommand(new RunCommand(
+        () -> shootSub.stopMotors(), shootSub));
+      
+      controller.b().whileTrue(new RunCommand(
+        () -> intakeSub.intake(), intakeSub));
+      controller.a().whileTrue(new RunCommand(
+        () -> intakeSub.setFeederRoller(1), intakeSub));
+      controller.y().whileTrue(new RunCommand(
+        () -> shootSub.shooting(), intakeSub));
   }
-
-  public void configurePathPlanner() {
-    return;
-  }
-
-  public void controllerPresetMain() {
-     //
-  }
-
 }
