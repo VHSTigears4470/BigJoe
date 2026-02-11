@@ -67,7 +67,10 @@ public class DriveSubsystem extends SubsystemBase{
     SwerveDriveOdometry odometry = null;
     private VisionSubsystem visionIO = null;
     private SwerveDrivePoseEstimator poseEstimator = null;
-    
+    private double lastMatchLog = 0.0;
+    private boolean lastTeleopEnabled = false;
+    private boolean lastAutonomousEnabled = false;
+
     //Constructs a new DriveSubsystem
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
         if(photonVision.isEmpty()) {
@@ -283,62 +286,6 @@ public class DriveSubsystem extends SubsystemBase{
 
         Logger.recordOutput("Drive/ModuleStates/Desired", desiredStates);
         Logger.recordOutput("Drive/ModuleStates/Actual", getSwerveModuleState());
-
-        //Logging Swerve Module Drive Outputs:
-        //Drive Velocity
-        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Velocity", frontLeft.getDriveVelocity());
-        Logger.recordOutput("Drive/DriverMotor/FrontRight/Velocity", frontRight.getDriveVelocity());
-        Logger.recordOutput("Drive/DriverMotor/BackLeft/Velocity", backLeft.getDriveVelocity());
-        Logger.recordOutput("Drive/DriverMotor/BackRight/Velocity", backRight.getDriveVelocity());
-
-        //Drive Position
-        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Position", frontLeft.getDrivePosition());
-        Logger.recordOutput("Drive/DriverMotor/FrontRight/Position", frontRight.getDrivePosition());
-        Logger.recordOutput("Drive/DriverMotor/BackLeft/Position", backLeft.getDrivePosition());
-        Logger.recordOutput("Drive/DriverMotor/BackRight/Position", backRight.getDrivePosition());
-
-        //Drive Current
-        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Current", frontLeft.getOutputCurrent());
-        Logger.recordOutput("Drive/DriverMotor/FrontRight/Current", frontRight.getOutputCurrent());
-        Logger.recordOutput("Drive/DriverMotor/BackLeft/Current", backLeft.getOutputCurrent());
-        Logger.recordOutput("Drive/DriverMotor/BackRight/Current", backRight.getOutputCurrent());
-
-        //Drive Temperature
-        Logger.recordOutput("Drive/DriverMotor/FrontLeft/Temperature", frontLeft.getMotorTemperature());
-        Logger.recordOutput("Drive/DriverMotor/FrontRight/Temperature", frontRight.getMotorTemperature());
-        Logger.recordOutput("Drive/DriverMotor/BackLeft/Temperature", backLeft.getMotorTemperature());
-        Logger.recordOutput("Drive/DriverMotor/BackRight/Temperature", backRight.getMotorTemperature());
-
-        //Logging Swerve Module Drive Outputs:
-        //Turn Velocity
-        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Velocity", frontLeft.getTurnVelocity());
-        Logger.recordOutput("Drive/TurnMotor/FrontRight/Velocity", frontRight.getTurnVelocity());
-        Logger.recordOutput("Drive/TurnMotor/BackLeft/Velocity", backLeft.getTurnVelocity());
-        Logger.recordOutput("Drive/TurnMotor/BackRight/Velocity", backRight.getTurnVelocity());
-
-        //Turn Position
-        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Position", frontLeft.getTurnPosition());
-        Logger.recordOutput("Drive/TurnMotor/FrontRight/Position", frontRight.getTurnPosition());
-        Logger.recordOutput("Drive/TurnMotor/BackLeft/Position", backLeft.getTurnPosition());
-        Logger.recordOutput("Drive/TurnMotor/BackRight/Position", backRight.getTurnPosition());
-
-        //Turn Current
-        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Current", frontLeft.getOutputCurrent());
-        Logger.recordOutput("Drive/TurnMotor/FrontRight/Current", frontRight.getOutputCurrent());
-        Logger.recordOutput("Drive/TurnMotor/BackLeft/Current", backLeft.getOutputCurrent());
-        Logger.recordOutput("Drive/TurnMotor/BackRight/Current", backRight.getOutputCurrent());
-
-        //Turn Temperature
-        Logger.recordOutput("Drive/TurnMotor/FrontLeft/Temperature", frontLeft.getMotorTemperature());
-        Logger.recordOutput("Drive/TurnMotor/FrontRight/Temperature", frontRight.getMotorTemperature());
-        Logger.recordOutput("Drive/TurnMotor/BackLeft/Temperature", backLeft.getMotorTemperature());
-        Logger.recordOutput("Drive/TurnMotor/BackRight/Temperature", backRight.getMotorTemperature());
-
-        //Logging Swerve Module Absolute Encoder Values:
-        Logger.recordOutput("Drive/AbsoluteEncoder/FrontLeft/Position", frontLeft.getAbsoluteEncoderPosition());
-        Logger.recordOutput("Drive/AbsoluteEncoder/FrontRight/Position", frontRight.getAbsoluteEncoderPosition());
-        Logger.recordOutput("Drive/AbsoluteEncoder/BackLeft/Position", backLeft.getAbsoluteEncoderPosition());
-        Logger.recordOutput("Drive/AbsoluteEncoder/BackRight/Position", backRight.getAbsoluteEncoderPosition());
 
         //Logging Battery Voltage
         Logger.recordOutput("Power/BatteryVoltage", RobotController.getBatteryVoltage());
