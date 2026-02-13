@@ -23,6 +23,12 @@ public class IDs {
         public static final int OUTER_RIGHT_ID = 4; //4
     }
 
+     public static final class IntakeConstants {
+        public static final int INTAKE_ID = 5;  //1
+        public static final int ROTATE_ID = 6; //2
+
+    }
+
     public static final class ShooterConstants {
         public static final int FLYWHEEL_ID = 20;
 
