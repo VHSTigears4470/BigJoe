@@ -28,6 +28,15 @@ public class IntakeSubsystem extends SubsystemBase {
         rotateMotor.setVelocity(-rpm, 0.000031);
     }
 
+    public void rampIntakeMotor() {
+        // TODO - finish ramp up for intake motor (linear model)
+        // double[] speedRates = {0.0000062,0.0000124,0.0000186,0.0000248}; // speeds we want the intake motor to accelerate to before it gets to the final, temporary
+        //
+        // while (intakeMotor.getRPM() != Intake.INTAKE_MOTOR_SPEED) {
+        //    intakeMotor.setVelocity(,0.000031)
+        // }
+    }
+
     public void stopMotors() {
         intakeMotor.stopMotors();
         rotateMotor.stopMotors();
