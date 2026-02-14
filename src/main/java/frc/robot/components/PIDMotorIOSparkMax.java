@@ -12,40 +12,22 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class PIDMotorIOSparkMax implements PIDMotorIO {
 
-  /** Motors */ 
   private SparkMax motor = null;
-
-  /** Encoders */
   private RelativeEncoder encoder = null;
-
-  /** Closed-loop controllers */
   private SparkClosedLoopController controller = null;
 
-  /* Talks to a drive motor consisting of NEOs, SPARKS MAX, and a Through Bore Encoder.*/
   public PIDMotorIOSparkMax(int ID, SparkMaxConfig config) {
-    // construct motor objects
     motor = new SparkMax(ID, MotorType.kBrushless);
-
-    // construct encoder objects
     encoder = motor.getEncoder();
-
-    // construct controller objects
     controller = motor.getClosedLoopController();
     
-    // apply the passed in configuration
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
-  /*  ------------------------------------------
-      implementation of PIDMotorIO interface
-      ------------------------------------------ */
-
-    /** Read the current state (called during periodic update). */
     @Override public void updateInputs(PIDMotorIOInputsAutoLogged inputs) {
         inputs.RPM = encoder.getVelocity();
     }
 
-    /** Reset drive encoder to zero. */
     @Override public void resetEncoder() {
         encoder.setPosition(0);
     }

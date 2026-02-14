@@ -1,7 +1,6 @@
 package frc.robot.Constants;
 
 public class IDs {
-    //update
     public static final class DriveConstants {
         public static final int FL_DRIVE_ID = 11; //11 //11
         public static final int BL_DRIVE_ID = 12; //13 //12
@@ -26,12 +25,10 @@ public class IDs {
      public static final class IntakeConstants {
         public static final int INTAKE_ID = 5;  //1
         public static final int ROTATE_ID = 6; //2
-
     }
 
     public static final class ShooterConstants {
         public static final int FLYWHEEL_ID = 21;
         public static final int SECONDARY_ID = 20;
-
     }
 }

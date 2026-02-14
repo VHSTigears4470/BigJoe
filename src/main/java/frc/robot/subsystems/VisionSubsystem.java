@@ -31,7 +31,6 @@ public class VisionSubsystem extends SubsystemBase {
     private final ArrayList<PhotonCamera> cameras = new ArrayList<PhotonCamera>();
     private final ArrayList<PhotonPoseEstimator> cameraEstimators = new ArrayList<PhotonPoseEstimator>();
 
-    //add more cameras if needed
     private StructPublisher<Pose3d> publisherCamera1Pose = NetworkTableInstance.getDefault().getStructTopic("Camera1Pose", Pose3d.struct).publish();
     private StructPublisher<Pose3d> publisherCamera2Pose = NetworkTableInstance.getDefault().getStructTopic("Camera2Pose", Pose3d.struct).publish();
     private StructArrayPublisher<Pose3d> publisherTagPoses = NetworkTableInstance.getDefault().getStructArrayTopic("TagPlacements", Pose3d.struct).publish();
@@ -39,15 +38,12 @@ public class VisionSubsystem extends SubsystemBase {
     private VisionIOInputs visionInputs = new VisionIOInputs();
 
     public VisionSubsystem() {
-        //change
         PortForwarder.add(5810, "10.44.70.11", 5800);
 
-        // camera 1
         cameras.add(new PhotonCamera("camera1"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]));
 
-        // camera 2
         cameras.add(new PhotonCamera("camera2"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]));
@@ -64,11 +60,13 @@ public class VisionSubsystem extends SubsystemBase {
         if(null != visionInputs.cameraTargets[1]) {
             publisherCamera2Pose.set(visionInputs.cameraPoses[1]);
         }
+
         List<AprilTag> Tags = Vision.Constants.TARGET_POSES.getTags();
         Pose3d[] tagPoses = new Pose3d[Tags.size()];
         for(int i = 0; i < Tags.size(); ++i) {
             tagPoses[i] = Tags.get(i).pose;
         }
+
         publisherTagPoses.set(tagPoses);
     }
 
@@ -99,7 +97,6 @@ public class VisionSubsystem extends SubsystemBase {
             Logger.recordOutput("Vision/Camera" + (i+1) + "/DistanceToHub", visionInputs.cameraTargets[i] != null && !visionInputs.cameraTargets[i].isEmpty() ? 
                 visionInputs.cameraTargets[i].get(0).getBestCameraToTarget().getTranslation().getNorm() : 0.0);
 
-            //Log each tracked April Tag ID
             if (visionInputs.cameraTargets[i] != null) {
                 for (int t = 0; t < visionInputs.cameraTargets[i].size(); t++) {
                     int id = visionInputs.cameraTargets[i].get(t).getFiducialId();

@@ -11,11 +11,9 @@ import frc.robot.Constants.Configs;
 import frc.robot.Constants.Drive;
 
 public class SwerveModuleIOSim implements SwerveModuleIO {
-    // Simulated motor physics
     private final DCMotorSim drivePhysSim;
     private final DCMotorSim turnPhysSim;
     
-    // PID controllers for simulating closed-loop control
     private final PIDController driveSimPID;
     private final PIDController turnSimPID;
     
@@ -58,7 +56,6 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
     
     @Override
     public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
-        // Update simulated physics
         drivePhysSim.update(Configs.SwerveModule.Sim.SIM_TICK_TIME);
         turnPhysSim.update(Configs.SwerveModule.Sim.SIM_TICK_TIME);
 
@@ -98,7 +95,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
         Rotation2d currentAngle = new Rotation2d(currentModuleAngleRad);
 
         // Optimize to avoid spinning more than 90 degrees
-        correctedState = SwerveModuleState.optimize(correctedState, currentAngle);
+        correctedState.optimize(currentAngle);
         targetState = correctedState;
 
         // Convert linear velocity to motor angular velocity for drive PID

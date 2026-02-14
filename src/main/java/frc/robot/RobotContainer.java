@@ -44,7 +44,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
     initSubystems();
 
     if(Operating.Constants.USING_DRIVE){
@@ -66,6 +65,7 @@ public class RobotContainer {
     if(Operating.Constants.USING_VISION) {
       visionSub = new VisionSubsystem();
     }
+
     if(Operating.Constants.USING_DRIVE) {
       driveSub = new DriveSubsystem(Optional.ofNullable(visionSub));
       driveSub.setDefaultCommand(new RunCommand(
@@ -74,30 +74,29 @@ public class RobotContainer {
           double x = OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND);
           double rot = OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND);
 
+          //Add logging for buttons
+
           // Record operator inputs with the project logger
           Logger.recordOutput("Operator/Drive/Y", y);
           Logger.recordOutput("Operator/Drive/X", x);
-
-          //Add logging for buttons
-
           Logger.recordOutput("Operator/Drive/Rot", rot);
           Logger.recordOutput("Operator/Drive/LeftTrigger", controller.leftTrigger().getAsBoolean());
           Logger.recordOutput("Operator/Drive/RightTrigger", controller.rightTrigger().getAsBoolean());
 
-          driveSub.drive(y, x, rot, true, "Default / Field Oriented"); // CHECK LATER
+          driveSub.drive(y, x, rot, true, "Default / Field Oriented"); 
         },
         driveSub));
     }
+
     if(Operating.Constants.USING_SHOOTER) {
       shooterSub = new ShooterSubsystem();
       shooterSub.setDefaultCommand(new RunCommand(
         () -> {
-          // Record shooter-related operator inputs
           Logger.recordOutput("Operator/Shooter/RightTrigger", controller.rightTrigger().getAsBoolean());
-          // Default behavior: hold RPM at 0 when not commanded
           shooterSub.setRPM(0);
         }, shooterSub));
     } 
+
     // extend if-else chain for other subsystems
   }
 
@@ -114,9 +113,11 @@ public class RobotContainer {
             ), 
             driveSub));
         }
+
         if(Operating.Constants.USING_SHOOTER) {
           controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(1500), shooterSub));
         }
+
         if(false && Operating.Constants.USING_DRIVE) {
             // 1. Define the target and constraints
             Pose2d targetPose = new Pose2d(10, 5, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
@@ -140,7 +141,6 @@ public class RobotContainer {
 }
 
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     if(Operating.Constants.USING_DRIVE){
       return autoChooser.getSelected();
     }

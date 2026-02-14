@@ -9,18 +9,15 @@ public class PIDMotor extends SubsystemBase {
   private PIDMotorIO io;
   private final PIDMotorIOInputsAutoLogged inputs = new PIDMotorIOInputsAutoLogged();
    
-  /* Constructs a SwerveModule */
   public PIDMotor(PIDMotorIO io) {
     this.io = io;
     io.resetEncoder();
   }
 
   @Override public void periodic() {
-    // update the IO inputs
     if (io instanceof PIDMotorIOSim) {
       ((PIDMotorIOSim) io).periodic();
     }
-
     io.updateInputs(inputs);
   }
 
@@ -42,14 +39,12 @@ public class PIDMotor extends SubsystemBase {
   public void set(double speed) {
     io.set(speed);
     Logger.recordOutput("PIDMotor/Set", speed);
-
   }
 
   public double getRPM() {
     return inputs.RPM;
   }
 
-  //Stops the motor;
   public void stopMotors() {
     io.stopMotors();
     Logger.recordOutput("PIDMotor/StopMotors", true);

@@ -14,46 +14,32 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public class SwerveModuleIOSparkMax implements SwerveModuleIO {
 
-  /** Motors */ 
   private SparkMax driveMotor = null;
   private SparkMax turnMotor = null;
 
-  /** Encoders */
   private RelativeEncoder driveEncoder = null;
   private AbsoluteEncoder turnEncoder = null;
 
-  /** Closed-loop controllers */
   private SparkClosedLoopController driveController = null;
   private SparkClosedLoopController turnController = null;
 
-  /* Angular offset of motor mounting */
   private double chassisAngularOffset = 0;
 
-  /* Talks to a drive motor consisting of NEOs, SPARKS MAX, and a Through Bore Encoder.*/
   public SwerveModuleIOSparkMax(int driveID, int turnID, double offset, SparkMaxConfig driveConfig, SparkMaxConfig turnConfig) {
-    // construct motor objects
     driveMotor = new SparkMax(driveID, MotorType.kBrushless);
     turnMotor = new SparkMax(turnID, MotorType.kBrushless);
 
-    // construct encoder objects
     driveEncoder = driveMotor.getEncoder();
     turnEncoder = turnMotor.getAbsoluteEncoder();
 
-    // construct controller objects
     driveController = driveMotor.getClosedLoopController();
     turnController = turnMotor.getClosedLoopController();
 
-    // record offset
     chassisAngularOffset = offset;
     
-    // apply the passed in configuration
     driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     turnMotor.configure(turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
-
-  /*  ------------------------------------------
-      implementation of SwerveModuleIO interface
-      ------------------------------------------ */
 
   @Override public void updateInputs(SwerveModuleIOInputsAutoLogged inputs) {
     inputs.drivePositionMeters = driveEncoder.getPosition();

@@ -61,7 +61,6 @@ public final class Configs {
             double FF_VELOCITY = 1 / Drive.ModuleConstants.DRIVE_WHEEL_FREE_RPS;
             double TURNING_FACTOR = 2 * Math.PI;
 
-            //Update as needed
             TURNING_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(20);
@@ -71,9 +70,8 @@ public final class Configs {
                 .velocityConversionFactor(TURNING_FACTOR / 60.0);
             TURNING_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                .pid(1,0,0) //update
+                .pid(1,0,0)
                 .outputRange(-1, 1)
-                //PID wrap around optimizes angle for turning
                 .positionWrappingEnabled(true)
                 .positionWrappingInputRange(0, TURNING_FACTOR);
 
@@ -137,7 +135,6 @@ public final class Configs {
         public static final SparkMaxConfig OUTER_LEFT_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig OUTER_RIGHT_CONFIG = new SparkMaxConfig();
 
-        //invert if needed
         static {
             INNER_LEFT_CONFIG
                 .idleMode(IdleMode.kBrake)
@@ -160,26 +157,23 @@ public final class Configs {
         public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig SECONDARY_CONFIG = new SparkMaxConfig();
 
-
-        //invert if needed
         static {
-            double FLYWHEEL_FACTOR = 1; //change/delete?
+            double FLYWHEEL_FACTOR = 1; 
 
             FLYWHEEL_CONFIG
                 .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(50)
                 .inverted(false); 
            
-          //  FLYWHEEL_CONFIG.encoder
-          //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
-          //      .velocityConversionFactor(FLYWHEEL_FACTOR / 60.0);
+        //  FLYWHEEL_CONFIG.encoder
+        //      .positionConversionFactor(FLYWHEEL_FACTOR) //meters
+        //      .velocityConversionFactor(FLYWHEEL_FACTOR / 60.0);
 
             FLYWHEEL_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(0.0004, 0, 0)
                 .outputRange(-1, 1)
             .maxMotion
-                // Set MAXMotion parameters for position control - Edit
                 .allowedProfileError(100);
 
             SECONDARY_CONFIG
@@ -194,8 +188,6 @@ public final class Configs {
         public static final SparkMaxConfig INTAKE_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig ROTATE_CONFIG = new SparkMaxConfig();
 
-
-        //invert if needed
         static {
             INTAKE_CONFIG
                 .idleMode(IdleMode.kCoast)
@@ -211,5 +203,4 @@ public final class Configs {
                 .smartCurrentLimit(50);
         }
     }
-
 }
