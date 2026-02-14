@@ -1,5 +1,7 @@
 package frc.robot.components;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
@@ -71,6 +73,7 @@ public class PIDMotorIOSim implements PIDMotorIO {
         motorSim.update(0.02);
 
         updateInputs(inputs);
-        // Add logging if needed
+        Logger.recordOutput("PIDMotor/Output", output);
+        Logger.recordOutput("PIDMotor/Measured", measured);
     }
 }

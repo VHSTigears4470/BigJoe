@@ -5,15 +5,15 @@ package frc.robot;
  */
 public final class Build {
 	public static final String MAVEN_GROUP = "";
-	public static final String MAVEN_NAME = "bigjoe";
+	public static final String MAVEN_NAME = "BigJoe-5";
 	public static final String VERSION = "unspecified";
-	public static final int GIT_REVISION = 36;
-	public static final String GIT_SHA = "010267e5e0e84c5c493219456b5d262efea42428";
-	public static final String GIT_DATE = "2026-02-13T00:19:16Z";
+	public static final int GIT_REVISION = 39;
+	public static final String GIT_SHA = "7f91bf3977abb62121f2d131b7ba1bf62ff2a46a";
+	public static final String GIT_DATE = "2026-02-14T00:13:27Z";
 	public static final String GIT_BRANCH = "main";
-	public static final String BUILD_DATE = "2026-02-13T02:39:57Z";
-	public static final long BUILD_UNIX_TIME = 1770950397477L;
-	public static final int DIRTY = 1;
+	public static final String BUILD_DATE = "2026-02-14T00:20:35Z";
+	public static final long BUILD_UNIX_TIME = 1771028435384L;
+	public static final int DIRTY = 0;
 
 	private Build(){}
 }
