@@ -38,7 +38,7 @@ public class ShooterSubsystem extends SubsystemBase{
     @Override
     public void periodic() {
         //SmartDashboard.putNumber("Target RPM", flywheelController.getSetpoint());
-        SmartDashboard.putNumber("Actual RPM", flywheel.getRPM());
+        //SmartDashboard.putNumber("Actual RPM", flywheel.getRPM());
 
         //Logging Target vs Actual RPM
         //Logger.recordOutput("Shooter/TargetRPM", flywheelController.getSetpoint());
@@ -52,5 +52,4 @@ public class ShooterSubsystem extends SubsystemBase{
 
         //Logging Shooter Fuel Sensor (Might not be applicable)
     }
-
 }
