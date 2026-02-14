@@ -18,6 +18,10 @@ public class PIDMotor extends SubsystemBase {
 
   @Override public void periodic() {
     // update the IO inputs
+    if (io instanceof PIDMotorIOSim) {
+      ((PIDMotorIOSim) io).periodic();
+    }
+
     io.updateInputs(inputs);
     //Add logging
   }
