@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.States.GameMode;
 import frc.robot.Constants.States.RobotMode;
@@ -41,22 +43,46 @@ public class Superstructure {
         if (DriverStation.isAutonomous())
             gameMode = GameMode.AUTONOMOUS;
         else if (matchTime >= 130)
+        {
             gameMode = GameMode.TRANSITION;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
         else if (matchTime >= 105)
+        {
             gameMode = GameMode.SHIFT_1;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
         else if (matchTime >= 80)
+        {
             gameMode = GameMode.SHIFT_2;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
         else if (matchTime >= 55)
+        {
             gameMode = GameMode.SHIFT_3;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
         else if (matchTime >= 30)
+        {
             gameMode = GameMode.SHIFT_4;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
         else
+        {
             gameMode = GameMode.ENDGAME;
+            Logger.recordOutput("Superstructure/GameMode", gameMode.toString());
+        }
 
         if (autoWon && (gameMode == GameMode.SHIFT_1 || gameMode == GameMode.SHIFT_3))
+        {
             hubActive = false;
+            Logger.recordOutput("Superstructure/HubActive", hubActive);
+        }
         else
+        {
             hubActive = true;
+            Logger.recordOutput("Superstructure/HubActive", hubActive);
+        }
     }
 
     public boolean isHubActive() {
