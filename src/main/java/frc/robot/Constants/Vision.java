@@ -46,5 +46,6 @@ public class Vision {
         public Pose3d cameraPoses[];
         public List<PhotonTrackedTarget>[] cameraTargets;
         public double[] timestamps;
+        public double[] ambiguity;
     }
 }

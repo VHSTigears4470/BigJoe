@@ -10,6 +10,7 @@ import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -86,9 +87,14 @@ public class VisionSubsystem extends SubsystemBase {
             if(!estimatedPose.isPresent()) {
                 visionInputs.cameraPoses[i] = Pose3d.kZero;
                 visionInputs.cameraTargets[i] = null;
+                visionInputs.ambiguity[i] = 100;
             } else {
                 visionInputs.cameraPoses[i] = estimatedPose.get().estimatedPose;
                 visionInputs.cameraTargets[i] = estimatedPose.get().targetsUsed;
+                visionInputs.ambiguity[i] = 0;
+                for(PhotonTrackedTarget target : result.getTargets())
+                    visionInputs.ambiguity[i] += target.getPoseAmbiguity();
+                visionInputs.ambiguity[i] /= result.getTargets().size();
             }
             Logger.recordOutput("Vision/Camera" + (i+1) + "/HasTarget", visionInputs.cameraTargets[i] != null);
             Logger.recordOutput("Vision/Camera" + (i+1) + "/TagCount", visionInputs.cameraTargets[i] != null ? visionInputs.cameraTargets[i].size() : 0);

@@ -250,7 +250,7 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     public void zeroHeading() {
-        if(Operating.Constants.USING_GYRO) gyro.reset();
+        if(Operating.Constants.USING_GYRO) gyro.setYaw(0);
     }
 
     public void stopModules() {
@@ -330,7 +330,13 @@ public class DriveSubsystem extends SubsystemBase{
         if(Operating.Constants.USING_VISION) {
             VisionIOInputs inputs = visionIO.getInputs();
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
-                if(inputs.cameraTargets[i] != null) {
+                if(inputs.cameraTargets[i] != null &&
+                   inputs.ambiguity[i] < 0.2 &&
+                   inputs.cameraPoses[i].toPose2d().getX() > 0.0 &&
+                   inputs.cameraPoses[i].toPose2d().getX() < 16.48 &&
+                   inputs.cameraPoses[i].toPose2d().getY() > 0.0 &&
+                   inputs.cameraPoses[i].toPose2d().getY() < 8.1 &&
+                   Math.abs(inputs.cameraPoses[i].getZ()) < 0.5) {
                     poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), inputs.timestamps[i]);
                 }
             }
