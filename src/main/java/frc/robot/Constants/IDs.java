@@ -16,8 +16,8 @@ public class IDs {
     }
 
     public static final class ClimbConstants {
-        public static final int INNER_LEFT_ID = 1;  //1
-        public static final int INNER_RIGHT_ID = 2; //2
+        public static final int INNER_LEFT_ID = 27;  //1
+        public static final int INNER_RIGHT_ID = 26; //2
         public static final int OUTER_LEFT_ID = 3;  //3
         public static final int OUTER_RIGHT_ID = 4; //4
     }

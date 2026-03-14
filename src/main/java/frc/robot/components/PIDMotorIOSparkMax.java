@@ -51,4 +51,8 @@ public class PIDMotorIOSparkMax implements PIDMotorIO {
     @Override public void stopMotors(){
         motor.stopMotor();
     }
+
+    @Override public double getEncoder(){
+        return encoder.getPosition();
+    }
 }

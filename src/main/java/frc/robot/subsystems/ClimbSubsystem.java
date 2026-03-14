@@ -31,11 +31,29 @@ public class ClimbSubsystem extends SubsystemBase{
         resetEncoders();
     }
 
-    public void moveInner(double speed) {
-        //if bot-limit switch
-        //speed = Math.max(speed, 0) <- prevents motors from impossibly going down
+    public void moveLeft(double speed) {
         innerLeft.set(speed);
+    }
+
+    public void moveRight(double speed) {
         innerRight.set(speed);
+    }
+
+    public void moveInner(double speed) {
+        moveLeft(speed);
+        moveRight(speed);
+    }
+
+    public void raise() {
+        while(innerLeft.getEncoder() > -317)
+            moveInner(-0.8);
+        moveInner(0);
+    }
+
+    public void retract() {
+        while(innerLeft.getEncoder() < 0)
+            moveInner(0.8);
+        moveInner(0);
     }
 
     public void moveOuter(double speed) {
@@ -54,8 +72,13 @@ public class ClimbSubsystem extends SubsystemBase{
         innerRight.stopMotors();
     }
 
+    public double getEncoder() {
+        return innerLeft.getEncoder();
+    }
+
     @Override
     public void periodic () {
-
+        Logger.recordOutput("Climb/Left", innerLeft.getEncoder());
+        Logger.recordOutput("Climb/Right", innerRight.getEncoder());
     }
 }

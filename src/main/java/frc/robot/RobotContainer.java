@@ -7,9 +7,11 @@ package frc.robot;
 import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.FollowPathCommand;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -26,6 +28,7 @@ import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.commands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -47,7 +50,23 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     initSubystems();
+    /*
+     PathConstraints constraints = new PathConstraints(
+                1.5, 2.0,
+                Units.degreesToRadians(240), 
+                Units.degreesToRadians(240));
 
+      PathPlannerPath path;
+      try {
+        //path = PathPlannerPath.fromPathFile("Climb");
+      } catch (Exception e) {
+        path = null;
+      }
+
+      //NamedCommands.registerCommand("moveToClimb", AutoBuilder.pathfindThenFollowPath(path, constraints));
+      NamedCommands.registerCommand("ClimbRetract", new ClimbRetract(climbSub));
+      NamedCommands.registerCommand("ClimbExtend", new ClimbExtend(climbSub));
+    */
     if(Operating.Constants.USING_DRIVE){
       autoChooser = AutoBuilder.buildAutoChooser();
       //Add paths here
@@ -97,14 +116,11 @@ public class RobotContainer {
           Logger.recordOutput("Operator/Shooter/RightTrigger", controller.rightTrigger().getAsBoolean());
           shooterSub.setRPM(0);
         }, shooterSub));
-    } 
+    }
 
     if(Operating.Constants.USING_CLIMB) {
-      climbSub = new ClimbSubsystem();
-      climbSub.setDefaultCommand(new RunCommand(
-        () -> {
-          climbSub.moveInner(0);        
-        }, climbSub));
+      climbSub = new ClimbSubsystem(); 
+      climbSub.setDefaultCommand(new RunCommand(() -> climbSub.moveInner(0), climbSub));
     } 
 
     // extend if-else chain for other subsystems
@@ -125,8 +141,10 @@ public class RobotContainer {
         }
 
         if(Operating.Constants.USING_CLIMB) {
-          controller.x().whileTrue(new RunCommand(() -> climbSub.moveInner(0.1), climbSub));
-          controller.y().whileTrue(new RunCommand(() -> climbSub.moveInner(-0.1), climbSub));
+          controller.y().whileTrue(new RunCommand(() -> climbSub.moveLeft(-0.8), climbSub));
+          controller.x().whileTrue(new RunCommand(() -> climbSub.moveLeft(0.8), climbSub));
+          controller.a().whileTrue(new RunCommand(() -> climbSub.moveRight(-0.8), climbSub));
+          controller.b().whileTrue(new RunCommand(() -> climbSub.moveRight(0.8), climbSub));
         }
 
         if(Operating.Constants.USING_SHOOTER) {
@@ -134,25 +152,7 @@ public class RobotContainer {
           controller.rightBumper().whileTrue(new RunCommand(() -> shooterSub.setSecondary(-0.8), shooterSub));
           controller.rightBumper().whileFalse(new RunCommand(() -> shooterSub.setSecondary(0), shooterSub));
         }
-
-        if(Operating.Constants.USING_DRIVE) {
-            // 1. Define the target and constraints
-            Pose2d targetPose = new Pose2d(15.2, 3.6, edu.wpi.first.math.geometry.Rotation2d.fromDegrees(180));
-            
-            PathConstraints constraints = new PathConstraints(
-                3.0, 5.0,
-                Units.degreesToRadians(240), 
-                Units.degreesToRadians(240));
-
-            // 2. Bind to a button (e.g., the B button)
-            controller.b().whileTrue(
-                AutoBuilder.pathfindToPose(
-                    targetPose,
-                    constraints,
-                    0.0 // Goal end velocity
-                )
-            );
-        }
+        
         break;
     }    
 }
