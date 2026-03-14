@@ -26,8 +26,8 @@ public class ClimbSubsystem extends SubsystemBase{
 
     //add limit switches?
     public ClimbSubsystem() {
-        innerLeft = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_LEFT_ID, Configs.Climb.INNER_LEFT_CONFIG));
-        innerRight = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.INNER_RIGHT_ID, Configs.Climb.INNER_RIGHT_CONFIG));
+        innerLeft = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.CLIMB_LEFT_ID, Configs.Climb.INNER_LEFT_CONFIG));
+        innerRight = new PIDMotor(new PIDMotorIOSparkMax(IDs.ClimbConstants.CLIMB_RIGHT_ID, Configs.Climb.INNER_RIGHT_CONFIG));
         resetEncoders();
     }
 

@@ -15,8 +15,8 @@ public class ShooterSubsystem extends SubsystemBase{
     private final PIDMotor secondary; //temp
 
     public ShooterSubsystem() {
-        flywheel = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_ID, Shooter.FLYWHEEL_CONFIG));
-        secondary = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.SECONDARY_ID, Shooter.SECONDARY_CONFIG));
+        flywheel = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_RIGHT_ID, Shooter.FLYWHEEL_CONFIG));
+        secondary = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FEEDER_ID, Shooter.SECONDARY_CONFIG));
     }
 
     public void setRPM(double rpm) {
