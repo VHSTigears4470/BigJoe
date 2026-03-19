@@ -25,7 +25,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -158,7 +157,7 @@ public class DriveSubsystem extends SubsystemBase{
         Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
         Rotation2d desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
        
-        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians() + Math.PI); //undo PI for actual 
+        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians()); //undo PI for actual 
     
         SwerveModuleState[] swerveModuleStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative

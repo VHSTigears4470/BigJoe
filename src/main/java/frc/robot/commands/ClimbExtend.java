@@ -13,18 +13,18 @@ public class ClimbExtend extends Command{
 
     @Override 
     public void initialize(){
-        climbSub.moveInner(-1);
+        climbSub.move(-1);
     }
 
     @Override
     public void execute(){
         if(climbSub.getEncoder() < -317)
-            climbSub.moveInner(0);
+            climbSub.move(0);
     }
 
     @Override
     public void end(boolean interrupted){
-        climbSub.moveInner(0);
+        climbSub.move(0);
     }
 
     @Override

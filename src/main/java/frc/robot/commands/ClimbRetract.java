@@ -13,18 +13,18 @@ public class ClimbRetract extends Command{
 
     @Override 
     public void initialize(){
-        climbSub.moveInner(0.8);
+        climbSub.move(0.8);
     }
 
     @Override
     public void execute(){
         if(climbSub.getEncoder() > 0)
-            climbSub.moveInner(0);
+            climbSub.move(0);
     }
 
     @Override
     public void end(boolean interrupted){
-        climbSub.moveInner(0);
+        climbSub.move(0);
     }
 
     @Override

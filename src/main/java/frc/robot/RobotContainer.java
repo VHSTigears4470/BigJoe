@@ -26,28 +26,22 @@ import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 import frc.robot.commands.*;
 
-/**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
   private DriveSubsystem driveSub;
   private VisionSubsystem visionSub;
   private ShooterSubsystem shooterSub;
   private ClimbSubsystem climbSub;
+  private IntakeSubsystem intakeSub;
 
   private final CommandXboxController controller =
       new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
   private final SendableChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     initSubystems();
     /*
@@ -111,17 +105,16 @@ public class RobotContainer {
 
     if(Operating.Constants.USING_SHOOTER) {
       shooterSub = new ShooterSubsystem();
-      shooterSub.setDefaultCommand(new RunCommand(
-        () -> {
-          Logger.recordOutput("Operator/Shooter/RightTrigger", controller.rightTrigger().getAsBoolean());
-          shooterSub.setRPM(0);
-        }, shooterSub));
     }
 
     if(Operating.Constants.USING_CLIMB) {
       climbSub = new ClimbSubsystem(); 
-      climbSub.setDefaultCommand(new RunCommand(() -> climbSub.moveInner(0), climbSub));
+      climbSub.setDefaultCommand(new RunCommand(() -> climbSub.move(0), climbSub));
     } 
+
+    if(Operating.Constants.USING_INTAKE) {
+      intakeSub = new IntakeSubsystem();
+    }
 
     // extend if-else chain for other subsystems
   }
@@ -131,7 +124,7 @@ public class RobotContainer {
     switch (preset) {
       default:
         if(Operating.Constants.USING_VISION) {
-            controller.leftTrigger().whileTrue(new RunCommand(() -> driveSub.driveAligned(
+            controller.rightTrigger().whileTrue(new RunCommand(() -> driveSub.driveAligned(
                   OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
                   OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
                   true,
@@ -141,16 +134,19 @@ public class RobotContainer {
         }
 
         if(Operating.Constants.USING_CLIMB) {
-          controller.y().whileTrue(new RunCommand(() -> climbSub.moveLeft(-0.8), climbSub));
-          controller.x().whileTrue(new RunCommand(() -> climbSub.moveLeft(0.8), climbSub));
-          controller.a().whileTrue(new RunCommand(() -> climbSub.moveRight(-0.8), climbSub));
-          controller.b().whileTrue(new RunCommand(() -> climbSub.moveRight(0.8), climbSub));
+          controller.y().whileTrue(new RunCommand(() -> climbSub.move(0.1), climbSub));
+          controller.a().whileTrue(new RunCommand(() -> climbSub.move(-0.1), climbSub));
         }
 
         if(Operating.Constants.USING_SHOOTER) {
-          controller.rightTrigger().whileTrue(new RunCommand(() -> shooterSub.setRPM(-2500), shooterSub));
-          controller.rightBumper().whileTrue(new RunCommand(() -> shooterSub.setSecondary(-0.8), shooterSub));
-          controller.rightBumper().whileFalse(new RunCommand(() -> shooterSub.setSecondary(0), shooterSub));
+          controller.leftBumper().whileTrue(new Shoot(shooterSub, 2000));
+          controller.rightBumper().whileTrue(new FeedToShoot(shooterSub));
+        }
+
+        if(Operating.Constants.USING_INTAKE) {
+          controller.x().onTrue(new RunCommand(() -> intakeSub.extend(), intakeSub));
+          controller.b().onTrue(new RunCommand(() -> intakeSub.retract(), intakeSub));
+          controller.leftTrigger().whileTrue(new Intake(intakeSub, 0.35));
         }
         
         break;
