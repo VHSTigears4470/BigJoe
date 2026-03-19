@@ -2,10 +2,13 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.interpolation.Interpolator;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
 import frc.robot.Constants.Configs.Shooter;
 import frc.robot.Constants.IDs.ShooterConstants;
+import frc.robot.components.LinearInterpolator;
 import frc.robot.components.PIDMotor;
 import frc.robot.components.PIDMotorIOSparkMax;
 
@@ -16,6 +19,7 @@ public class ShooterSubsystem extends SubsystemBase{
     private final PIDMotor feeder; 
     private final PIDMotor hopper;
     private double desiredRPM;
+    private LinearInterpolator interpolator;
 
     public ShooterSubsystem() {
         flywheelRight = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_RIGHT_ID, Shooter.FLYWHEEL_RIGHT_CONFIG));
