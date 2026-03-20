@@ -293,6 +293,13 @@ public class DriveSubsystem extends SubsystemBase{
         }
     }
 
+    public double calculateDistance()
+    {
+       return getPose().getTranslation().getDistance(Vision.Constants.getHubPose().toPose2d().getTranslation()); 
+    }
+
+    
+
     @Override
     public void periodic() {
         Logger.recordOutput("Drive/Pose", poseEstimator.getEstimatedPosition());
