@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Configs.Shooter;
@@ -15,20 +17,41 @@ public class ShooterSubsystem extends SubsystemBase{
     private final PIDMotor flywheelLeft;
     private final PIDMotor feeder; 
     private final PIDMotor hopper;
+    private final InterpolatingDoubleTreeMap table;
     private double desiredRPM;
+    private boolean shooterActive;
 
     public ShooterSubsystem() {
         flywheelRight = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_RIGHT_ID, Shooter.FLYWHEEL_RIGHT_CONFIG));
         flywheelLeft = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FLYWHEEL_LEFT_ID, Shooter.FLYWHEEL_LEFT_CONFIG));
         feeder = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.FEEDER_ID, Shooter.FEEDER_CONFIG));
         hopper = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.HOPPER_ID, Shooter.HOPPER_CONFIG));
+        
+        table = new InterpolatingDoubleTreeMap();
+        table.put(Units.inchesToMeters(118.75), 3300.0); 
+        table.put(Units.inchesToMeters(87.75), 2400.0); 
+        table.put(Units.inchesToMeters(177.75), 5000.0); 
+
+        shooterActive = false;
     }
 
     public void setDesiredRPM(double desiredRPM) {
         this.desiredRPM = desiredRPM;
         SmartDashboard.putNumber("Desired RPM", desiredRPM);
         Logger.recordOutput("Shooter/Desired RPM", desiredRPM);
+    }
 
+    public void toggleShooter() {
+        shooterActive = !shooterActive;
+    }
+
+    public boolean flywheelReady() {
+        return Math.abs(flywheelRight.getRPM()) - desiredRPM < desiredRPM * 0.1;
+    }
+    
+    public void updateDesiredRPM(double distance) {
+        desiredRPM = table.get(distance);
+        Logger.recordOutput("Shooter/Desired RPM", desiredRPM);
     }
 
     public void setFeeder(double speed) {
@@ -50,6 +73,8 @@ public class ShooterSubsystem extends SubsystemBase{
 
     @Override
     public void periodic() {
+        if(!shooterActive)
+            desiredRPM = 0;
         if(desiredRPM == 0 && Math.abs(flywheelRight.getRPM()) < 150) {
             flywheelRight.set(0);
         } else {

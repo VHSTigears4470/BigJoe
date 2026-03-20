@@ -14,16 +14,21 @@ public class Shoot extends Command {
 
     @Override 
     public void initialize(){
-        shooterSub.setDesiredRPM(rpm);
+        shooterSub.toggleShooter();
+        if(rpm != 0)
+            shooterSub.setDesiredRPM(rpm);
+
     }
 
     @Override
     public void execute(){
+        if(rpm != 0)
+            shooterSub.setDesiredRPM(rpm);
     }
 
     @Override
     public void end(boolean interrupted){
-        shooterSub.setDesiredRPM(0);
+        shooterSub.toggleShooter();
     }
 
     @Override

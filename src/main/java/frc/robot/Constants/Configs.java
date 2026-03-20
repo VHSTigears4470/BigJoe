@@ -158,8 +158,8 @@ public final class Configs {
                 .inverted(false); 
             FLYWHEEL_RIGHT_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .apply(new FeedForwardConfig().kV(.0002055)) // ~1/MAX_RPM  .00020352
-                .p(0.00025) //.00078
+                .apply(new FeedForwardConfig().kV(.000207)) // ~1/MAX_RPM  .00020352
+                .p(0.0002) //.00078
                 .d(0.25)//d can't be neg
                 .outputRange(-1, 1);
             FLYWHEEL_LEFT_CONFIG

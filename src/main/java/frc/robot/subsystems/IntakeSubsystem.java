@@ -23,11 +23,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void extend() {
-        rotateMotor.setSetpoint(14.643, 0);
+        rotateMotor.setSetpoint(17, 0);
     }
 
     public void retract() {
-        rotateMotor.setSetpoint(-0.8, 0);
+        rotateMotor.setSetpoint(-1.0, 0);
+    }
+
+    public void retractToShoot() {
+        rotateMotor.setSetpoint(1.5, 0);
     }
 
     public void stopMotors() {

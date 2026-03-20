@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -176,6 +177,10 @@ public class DriveSubsystem extends SubsystemBase{
         SmartDashboard.putString("Drive Mode", statusName);
     }
 
+    public double getDistanceToHub(){
+        return poseEstimator.getEstimatedPosition().getTranslation().getDistance(Vision.Constants.getHubPose().toPose2d().getTranslation());
+    }
+
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
         SwerveModuleState[] targetStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(targetSpeeds);
@@ -280,7 +285,7 @@ public class DriveSubsystem extends SubsystemBase{
                 ),
                 config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-                () -> false, //DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
                 this // Subsystem for requirements
             );
         } catch (Exception ex) {
@@ -330,7 +335,7 @@ public class DriveSubsystem extends SubsystemBase{
             VisionIOInputs inputs = visionIO.getInputs();
             for(int i = 0; i < inputs.cameraPoses.length; i++) {
                 if(inputs.cameraTargets[i] != null &&
-                   inputs.ambiguity[i] < 0.2 &&
+                   inputs.ambiguity[i] < 0.15 &&
                    inputs.cameraPoses[i].toPose2d().getX() > 0.0 &&
                    inputs.cameraPoses[i].toPose2d().getX() < 16.48 &&
                    inputs.cameraPoses[i].toPose2d().getY() > 0.0 &&

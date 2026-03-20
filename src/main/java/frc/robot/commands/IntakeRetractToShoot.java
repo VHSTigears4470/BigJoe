@@ -2,32 +2,25 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.ShooterSubsystem;
 
-public class FeedToShoot extends Command {
-    private final ShooterSubsystem shooterSub;
+public class IntakeRetractToShoot extends Command {
     private final IntakeSubsystem intakeSub;
-    
-    public FeedToShoot(ShooterSubsystem shooterSub, IntakeSubsystem intakeSub){
-        this.shooterSub = shooterSub;
+
+    public IntakeRetractToShoot(IntakeSubsystem intakeSub){
         this.intakeSub = intakeSub;
     }
 
     @Override 
     public void initialize(){
-        shooterSub.setFeeder(0.95);
-        shooterSub.setHopper(0.2);
         intakeSub.retractToShoot();
     }
 
     @Override
-    public void execute(){}
+    public void execute(){
+    }
 
     @Override
     public void end(boolean interrupted){
-        shooterSub.setFeeder(0);
-        shooterSub.setHopper(0);
-        intakeSub.extend();
     }
 
     @Override
