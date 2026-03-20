@@ -6,10 +6,8 @@ import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.RobotContainer;
 import frc.robot.Constants.Configs.Shooter;
 import frc.robot.Constants.IDs.ShooterConstants;
-import frc.robot.components.LinearInterpolator;
 import frc.robot.components.PIDMotor;
 import frc.robot.components.PIDMotorIOSparkMax;
 
