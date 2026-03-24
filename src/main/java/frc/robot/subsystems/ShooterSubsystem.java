@@ -28,8 +28,8 @@ public class ShooterSubsystem extends SubsystemBase{
         hopper = new PIDMotor(new PIDMotorIOSparkMax(ShooterConstants.HOPPER_ID, Shooter.HOPPER_CONFIG));
         
         table = new InterpolatingDoubleTreeMap();
-        table.put(Units.inchesToMeters(118.75), 3300.0); 
-        table.put(Units.inchesToMeters(87.75), 2400.0); 
+        table.put(Units.inchesToMeters(118.75), 3450.0); 
+        table.put(Units.inchesToMeters(87.75), 2550.0); 
         table.put(Units.inchesToMeters(177.75), 5000.0); 
 
         shooterActive = false;

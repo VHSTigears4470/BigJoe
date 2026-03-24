@@ -5,16 +5,16 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class Intake extends Command {
     private final IntakeSubsystem intakeSub;
-    private final double rpm;
+    private final double speed;
 
     public Intake(IntakeSubsystem intakeSub, double speed){
         this.intakeSub = intakeSub;
-        this.rpm = speed;
+        this.speed = speed;
     }
 
     @Override 
     public void initialize(){
-        intakeSub.setIntake(rpm);
+        intakeSub.setIntake(speed);
     }
 
     @Override

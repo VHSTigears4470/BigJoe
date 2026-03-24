@@ -39,6 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
         rotateMotor.stopMotors();
     }
 
+    public double getRotation() {
+        return rotateMotor.getEncoder();
+    }
+
     public void periodic(){
         Logger.recordOutput("IntakeSubsystem/Rotate Value", rotateMotor.getEncoder());
         Logger.recordOutput("IntakeSubsystem/IntakeMotorRPM", intakeMotor.getRPM());

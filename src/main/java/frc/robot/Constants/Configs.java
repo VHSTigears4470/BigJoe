@@ -208,11 +208,11 @@ public final class Configs {
             ROTATE_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(.6)
-                .outputRange(-0.7, 0.7)
+                .outputRange(-0.85, 0.85)
                 .maxMotion
-                .cruiseVelocity(1000)
-                .maxAcceleration(700)
-                .allowedProfileError(.25);
+                .cruiseVelocity(1500)
+                .maxAcceleration(750)
+                .allowedProfileError(.2);
         }
     }
 }

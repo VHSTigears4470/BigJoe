@@ -25,7 +25,7 @@ public class Vision {
         public static final Transform3d[] CAMERA_TO_ROBOT = 
         {
          new Transform3d(new Translation3d(Units.inchesToMeters(.5), Units.inchesToMeters(-.25), Units.inchesToMeters(28)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(18), Units.degreesToRadians(0))),
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(24.6), Units.degreesToRadians(0))),
          new Transform3d(new Translation3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(-.75), Units.inchesToMeters(19.5)), 
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(180)))
         };
@@ -34,8 +34,8 @@ public class Vision {
         public static final Matrix<N3, N1> SINGLE_STD_DEVS = VecBuilder.fill(0.5, 0.5, 10);
         public static final Matrix<N3, N1> MULTI_STD_DEVS = VecBuilder.fill(0.5, 0.5, 10);
 
-        public static final Pose3d redHubPose = new Pose3d(Units.inchesToMeters(468.56), Units.inchesToMeters(158.32), Units.inchesToMeters(72.0), new Rotation3d());
-        public static final Pose3d blueHubPose = new Pose3d(Units.inchesToMeters(152.56), Units.inchesToMeters(158.32),  Units.inchesToMeters(72.0), new Rotation3d());
+        public static final Pose3d redHubPose = new Pose3d(11.915, 4.03, Units.inchesToMeters(72.0), new Rotation3d());
+        public static final Pose3d blueHubPose = new Pose3d(4.63, 4.03,  Units.inchesToMeters(72.0), new Rotation3d());
        
         public static final Pose3d getHubPose() {
             Pose3d pose = DriverStation.getAlliance().equals(Optional.of(Alliance.Red)) ? redHubPose : blueHubPose;
