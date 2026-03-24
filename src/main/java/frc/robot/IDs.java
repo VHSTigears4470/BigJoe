@@ -1,4 +1,4 @@
-package frc.robot.Constants;
+package frc.robot;
 
 public class IDs {
     public static final class DriveConstants {
