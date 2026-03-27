@@ -58,6 +58,7 @@ public class DriveSubsystem extends SubsystemBase{
     private double lastMatchLog = 0.0;
     private boolean lastTeleopEnabled = false;
     private boolean lastAutonomousEnabled = false;
+    private boolean drivingAligned = false;
 
     public DriveSubsystem(Optional<VisionSubsystem> photonVision) {
         if(Robot.isSimulation()) {
@@ -128,7 +129,24 @@ public class DriveSubsystem extends SubsystemBase{
         double multiplier = 0.5; 
         double xSpeedDelivered = xSpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
         double ySpeedDelivered = ySpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
-        double rotDelivered = rot * Drive.Constants.MAX_ANGULAR_SPEED * multiplier;
+        double rotDelivered;
+        
+        if(drivingAligned) {
+            Pose2d drivePose = getPose();
+            Translation2d shooterOffsetRobot = new Translation2d(); //Update fpr shooter location;
+            Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(drivePose.getRotation());
+            Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
+            Rotation2d desiredAngle;
+            if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue && drivePose.getX() > 12.528
+            || DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red && drivePose.getX() < 4.00) {
+                desiredAngle = new Rotation2d(Math.PI);
+            } else {
+                desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
+            }
+            rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians()); //undo PI for actual 
+        } else {
+            rotDelivered = rot * Drive.Constants.MAX_ANGULAR_SPEED * multiplier;
+        }
 
         SwerveModuleState[] swerveModuleStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(
             fieldRelative
@@ -147,34 +165,9 @@ public class DriveSubsystem extends SubsystemBase{
         SmartDashboard.putString("Drive Mode", statusName);
     }
 
-    public void driveAligned(double xSpeed, double ySpeed, boolean fieldRelative, String statusName) {
-        double multiplier = 0.5;
-        double xSpeedDelivered = xSpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
-        double ySpeedDelivered = ySpeed * Drive.Constants.MAX_METERS_PER_SECOND * multiplier;
-
-        Pose2d drivePose = getPose();
-        Translation2d shooterOffsetRobot = new Translation2d(); //Update fpr shooter location;
-        Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(drivePose.getRotation());
-        Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
-        Rotation2d desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
-       
-        double rotDelivered = Drive.Constants.ROTATION_CONTROLLER.calculate(drivePose.getRotation().getRadians(), desiredAngle.getRadians()); //undo PI for actual 
-    
-        SwerveModuleState[] swerveModuleStates = Drive.Constants.DRIVE_KINEMATICS.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
-                getRotation2d())
-                : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-            swerveModuleStates, Drive.Constants.MAX_METERS_PER_SECOND);
-        desiredStates = swerveModuleStates;
-
-        frontLeft.setDesiredState(swerveModuleStates[0]);
-        frontRight.setDesiredState(swerveModuleStates[1]);
-        backLeft.setDesiredState(swerveModuleStates[2]);
-        backRight.setDesiredState(swerveModuleStates[3]);
-
-        SmartDashboard.putString("Drive Mode", statusName);
+    public void toggleDrivingAligned() {
+        drivingAligned = !drivingAligned;
+        Logger.recordOutput("Drive/Driving Aligned", drivingAligned);
     }
 
     public double getDistanceToHub(){
@@ -272,7 +265,7 @@ public class DriveSubsystem extends SubsystemBase{
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                this::getOdometry,   // Supplier of current robot pose *getPose
+                this::getPose,   // Supplier of current robot pose *getPose
                 this::resetOdometry,         // Consumer for seeding pose against auto
                 this::getRobotRelativeSpeeds, // Supplier of current robot speeds
                 // Consumer of ChassisSpeeds and feedforwards to drive the robot
@@ -306,6 +299,7 @@ public class DriveSubsystem extends SubsystemBase{
         Logger.recordOutput("Drive/Pose/X", poseEstimator.getEstimatedPosition().getX());
         Logger.recordOutput("Drive/Pose/Y", poseEstimator.getEstimatedPosition().getY());
         Logger.recordOutput("Drive/Pose/Rotation", poseEstimator.getEstimatedPosition().getRotation().getDegrees());
+        Logger.recordOutput("Drive/Pose/Distance to Hub", getDistanceToHub());
 
         if (Operating.Constants.USING_GYRO) {
             Logger.recordOutput("Drive/Gyro/Yaw", gyro.getYaw().getValue());

@@ -13,13 +13,15 @@ public class ClimbRetract extends Command{
 
     @Override 
     public void initialize(){
-        climbSub.move(0.8);
+        if(climbSub.getEncoder() > 43)
+            climbSub.move(-0.8);
+        else 
+            climbSub.move(0.8);
     }
 
     @Override
     public void execute(){
-        if(climbSub.getEncoder() > 0)
-            climbSub.move(0);
+        
     }
 
     @Override
@@ -29,6 +31,6 @@ public class ClimbRetract extends Command{
 
     @Override
     public boolean isFinished(){
-        return false;
+        return Math.abs(climbSub.getEncoder() - 43) < 3;
     }
 }

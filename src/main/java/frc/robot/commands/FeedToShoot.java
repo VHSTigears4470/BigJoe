@@ -22,17 +22,14 @@ public class FeedToShoot extends Command {
 
     @Override
     public void execute(){
-        if(Math.abs(intakeSub.getRotation() - 1.5) < 1){
-            intakeSub.extend();
-        } else if (Math.abs(intakeSub.getRotation() - 17) < 1){
-            intakeSub.retractToShoot();
-        }
+
     }
 
     @Override
     public void end(boolean interrupted){
         shooterSub.setFeeder(0);
         shooterSub.setHopper(0);
+        intakeSub.setIntake(0);
         intakeSub.extend();
     }
 

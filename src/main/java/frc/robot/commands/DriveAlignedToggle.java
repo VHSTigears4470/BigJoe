@@ -1,22 +1,23 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
 
-public class IntakeRetract extends Command {
-    private final IntakeSubsystem intakeSub;
+public class DriveAlignedToggle extends Command {
+    private final DriveSubsystem driveSub;
 
-    public IntakeRetract(IntakeSubsystem intakeSub){
-        this.intakeSub = intakeSub;
+    public DriveAlignedToggle(DriveSubsystem driveSub){
+        this.driveSub = driveSub;
     }
 
     @Override 
     public void initialize(){
-        intakeSub.retract();
+        driveSub.toggleDrivingAligned();
     }
 
     @Override
     public void execute(){
+        
     }
 
     @Override

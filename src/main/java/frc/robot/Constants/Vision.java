@@ -24,8 +24,12 @@ public class Vision {
     public static final class Constants {
         public static final Transform3d[] CAMERA_TO_ROBOT = 
         {
-         new Transform3d(new Translation3d(Units.inchesToMeters(.5), Units.inchesToMeters(-.25), Units.inchesToMeters(28)), 
-            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(24.6), Units.degreesToRadians(0))),
+         new Transform3d(new Translation3d(Units.inchesToMeters(-.91), Units.inchesToMeters(-0.000701), Units.inchesToMeters(28.521)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-25), Units.degreesToRadians(0))),
+         new Transform3d(new Translation3d(Units.inchesToMeters(-13.448), Units.inchesToMeters(12.628), Units.inchesToMeters(8.765)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-25), Units.degreesToRadians(-225))),
+         new Transform3d(new Translation3d(Units.inchesToMeters(-13.448), Units.inchesToMeters(-12.628), Units.inchesToMeters(8.765)), 
+            new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(-25), Units.degreesToRadians(-135))),
          new Transform3d(new Translation3d(Units.inchesToMeters(-13.75), Units.inchesToMeters(-.75), Units.inchesToMeters(19.5)), 
             new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(0), Units.degreesToRadians(180)))
         };

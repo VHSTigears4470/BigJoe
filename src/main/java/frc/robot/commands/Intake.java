@@ -5,29 +5,32 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 public class Intake extends Command {
     private final IntakeSubsystem intakeSub;
-    private final double speed;
 
-    public Intake(IntakeSubsystem intakeSub, double speed){
+    public Intake(IntakeSubsystem intakeSub){
         this.intakeSub = intakeSub;
-        this.speed = speed;
     }
 
     @Override 
     public void initialize(){
-        intakeSub.setIntake(speed);
+        intakeSub.toggleIntake();
+        if(intakeSub.isRunning())
+            intakeSub.setIntake(0.8);
+        else
+            intakeSub.setIntake(0);
     }
 
     @Override
     public void execute(){
+        
     }
 
     @Override
     public void end(boolean interrupted){
-        intakeSub.setIntake(0);
+
     }
 
     @Override
     public boolean isFinished(){
-        return false;
+        return true;
     }
 }

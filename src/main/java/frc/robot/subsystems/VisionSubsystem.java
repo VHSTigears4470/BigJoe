@@ -34,20 +34,30 @@ public class VisionSubsystem extends SubsystemBase {
 
     private StructPublisher<Pose3d> publisherCamera1Pose = NetworkTableInstance.getDefault().getStructTopic("Camera1Pose", Pose3d.struct).publish();
     private StructPublisher<Pose3d> publisherCamera2Pose = NetworkTableInstance.getDefault().getStructTopic("Camera2Pose", Pose3d.struct).publish();
+    private StructPublisher<Pose3d> publisherCamera3Pose = NetworkTableInstance.getDefault().getStructTopic("Camera3Pose", Pose3d.struct).publish();
+    private StructPublisher<Pose3d> publisherCamera4Pose = NetworkTableInstance.getDefault().getStructTopic("Camera4Pose", Pose3d.struct).publish();
     private StructArrayPublisher<Pose3d> publisherTagPoses = NetworkTableInstance.getDefault().getStructArrayTopic("TagPlacements", Pose3d.struct).publish();
 
     private VisionIOInputs visionInputs = new VisionIOInputs();
 
     public VisionSubsystem() {
-        PortForwarder.add(5810, "10.44.70.11", 5800);
+        PortForwarder.add(5800, "photonvison-1", 5800);
 
-        cameras.add(new PhotonCamera("PV1"));
+        cameras.add(new PhotonCamera("PV-Front"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]));
 
-        cameras.add(new PhotonCamera("PV2"));
+        cameras.add(new PhotonCamera("PV-BackLeft"));
         cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]));
+        
+        cameras.add(new PhotonCamera("PV-BackRight"));
+        cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES, 
+            PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[2]));
+
+        cameras.add(new PhotonCamera("4"));
+        cameraEstimators.add(new PhotonPoseEstimator(Vision.Constants.TARGET_POSES,
+             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[3]));
     }
 
     @Override
@@ -60,6 +70,12 @@ public class VisionSubsystem extends SubsystemBase {
         }
         if(null != visionInputs.cameraTargets[1]) {
             publisherCamera2Pose.set(visionInputs.cameraPoses[1]);
+        }
+        if(null != visionInputs.cameraTargets[2]) {
+            publisherCamera3Pose.set(visionInputs.cameraPoses[2]);
+        }
+        if(null != visionInputs.cameraTargets[3]) {
+            publisherCamera4Pose.set(visionInputs.cameraPoses[3]);
         }
 
         List<AprilTag> Tags = Vision.Constants.TARGET_POSES.getTags();

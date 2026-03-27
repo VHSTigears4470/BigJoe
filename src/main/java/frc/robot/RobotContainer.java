@@ -92,20 +92,14 @@ public class RobotContainer {
           },
           driveSub));
 
-      NamedCommands.registerCommand("DriveAligned", new RunCommand(() -> driveSub.driveAligned(
-          OI.Constants.DRIVER_AXIS_Y_INVERTED
-              * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
-          OI.Constants.DRIVER_AXIS_X_INVERTED
-              * MathUtil.applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
-          true,
-          "Aiming / Field Oriented"),
-          driveSub));
+      NamedCommands.registerCommand("ToggleDriveAligned", new DriveAlignedToggle(driveSub));
 
       PathConstraints constraints = new PathConstraints(
           1.5, 2.0,
           Units.degreesToRadians(240),
           Units.degreesToRadians(240));
       PathPlannerPath path;
+      
       try {
         path = PathPlannerPath.fromPathFile("ToFrame");
       } catch (Exception e) {
@@ -134,19 +128,32 @@ public class RobotContainer {
       }
       NamedCommands.registerCommand("ShootLeft", AutoBuilder.pathfindThenFollowPath(path, constraints));
 
+      try {
+        path = PathPlannerPath.fromPathFile("ClimbLeft");
+      } catch (Exception e) {
+        path = null;
+      }
+      NamedCommands.registerCommand("ClimbLeft", AutoBuilder.pathfindThenFollowPath(path, constraints));
+
+      try {
+        path = PathPlannerPath.fromPathFile("ClimbRight");
+      } catch (Exception e) {
+        path = null;
+      }
+      NamedCommands.registerCommand("ClimbRight", AutoBuilder.pathfindThenFollowPath(path, constraints));
+
     }
 
     if (Operating.Constants.USING_INTAKE) {
       intakeSub = new IntakeSubsystem();
       NamedCommands.registerCommand("Extend", new IntakeExtend(intakeSub));
-      NamedCommands.registerCommand("Intake", new Intake(intakeSub, 0.8));
-      NamedCommands.registerCommand("RaiseToShoot", new IntakeRetractToShoot(intakeSub));
+      NamedCommands.registerCommand("Intake", new Intake(intakeSub));
     }
 
     if (Operating.Constants.USING_SHOOTER) {
       shooterSub = new ShooterSubsystem();
-      shooterSub.setDefaultCommand(
-          new RunCommand(() -> shooterSub.updateDesiredRPM(driveSub.getDistanceToHub()), shooterSub));
+      //shooterSub.setDefaultCommand(
+          //new RunCommand(() -> shooterSub.updateDesiredRPM(driveSub.getDistanceToHub()), shooterSub));
       NamedCommands.registerCommand("Shoot", new Shoot(shooterSub, 0));
       NamedCommands.registerCommand("Shoot3000", new Shoot(shooterSub, 3000));
       if (Operating.Constants.USING_INTAKE)
@@ -155,7 +162,9 @@ public class RobotContainer {
 
     if (Operating.Constants.USING_CLIMB) {
       climbSub = new ClimbSubsystem();
-      climbSub.setDefaultCommand(new RunCommand(() -> climbSub.move(0), climbSub));
+      NamedCommands.registerCommand("ClimbExtend", new ClimbExtend(climbSub));
+      NamedCommands.registerCommand("ClimbRetract", new ClimbRetract(climbSub));
+      NamedCommands.registerCommand("ClimbZero", new ClimbZero(climbSub));
     }
     // extend if-else chain for other subsystems
   }
@@ -165,26 +174,20 @@ public class RobotContainer {
     switch (preset) {
       default:
         if (Operating.Constants.USING_CLIMB) {
-          controller.y().whileTrue(new RunCommand(() -> climbSub.move(0.3), climbSub));
-          controller.a().whileTrue(new RunCommand(() -> climbSub.move(-0.3), climbSub));
+          controller.povUp().onTrue(new ClimbExtend(climbSub));
+          controller.povDown().onTrue(new ClimbRetract(climbSub));
+          controller.povRight().onTrue(new ClimbZero(climbSub));
         }
 
         if (Operating.Constants.USING_SHOOTER && Operating.Constants.USING_DRIVE && Operating.Constants.USING_VISION) {
-          controller.leftBumper().whileTrue(new ParallelCommandGroup(
-              new RunCommand(() -> driveSub.driveAligned(
-                  OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil
-                      .applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND),
-                  OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil
-                      .applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND),
-                  true,
-                  "Aiming / Field Oriented"),
-                  driveSub),
+          controller.leftBumper().onTrue(new ParallelCommandGroup(
+              new DriveAlignedToggle(driveSub),
               new Shoot(shooterSub, 0)));
         }
 
         if (Operating.Constants.USING_SHOOTER) {
-          controller.x().whileTrue(new Shoot(shooterSub, 5000));
-          controller.rightBumper().whileTrue(new Shoot(shooterSub, 3000));
+          controller.x().onTrue(new Shoot(shooterSub, 2250));
+          controller.rightBumper().onTrue(new Shoot(shooterSub, 3200));
         }
 
         if (Operating.Constants.USING_INTAKE && Operating.Constants.USING_SHOOTER) {
@@ -192,9 +195,8 @@ public class RobotContainer {
         }
 
         if (Operating.Constants.USING_INTAKE) {
-          controller.b().onTrue(new RunCommand(() -> intakeSub.extend(), intakeSub));
-          controller.a().onTrue(new RunCommand(() -> intakeSub.retract(), intakeSub));
-          controller.rightTrigger().whileTrue(new Intake(intakeSub, 0.7));
+          controller.b().onTrue(new IntakeToggle(intakeSub));
+          controller.rightTrigger().onTrue(new Intake(intakeSub));
         }
 
         break;

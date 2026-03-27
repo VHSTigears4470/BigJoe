@@ -3,20 +3,20 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ClimbSubsystem;
 
-public class ClimbExtend extends Command{
+public class ClimbZero extends Command{
     private final ClimbSubsystem climbSub;
 
-    public ClimbExtend(ClimbSubsystem climbSub){
+    public ClimbZero(ClimbSubsystem climbSub){
         this.climbSub = climbSub;
         addRequirements(climbSub);
     }
 
     @Override 
     public void initialize(){
-        if(climbSub.getEncoder() < 141)
-            climbSub.move(0.8);
-        else 
+        if(climbSub.getEncoder() > 0)
             climbSub.move(-0.8);
+        else 
+            climbSub.move(0.8);
     }
 
     @Override
@@ -31,6 +31,6 @@ public class ClimbExtend extends Command{
 
     @Override
     public boolean isFinished(){
-        return Math.abs(climbSub.getEncoder() - 141) < 3;
+        return Math.abs(climbSub.getEncoder()) < 3;
     }
 }

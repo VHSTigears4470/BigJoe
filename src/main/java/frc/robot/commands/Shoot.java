@@ -10,29 +10,27 @@ public class Shoot extends Command {
     public Shoot(ShooterSubsystem shooterSub, double rpm){
         this.shooterSub = shooterSub;
         this.rpm = rpm;
+        addRequirements(shooterSub);
     }
 
     @Override 
     public void initialize(){
+        shooterSub.setDesiredRPM(rpm);
         shooterSub.toggleShooter();
-        if(rpm != 0)
-            shooterSub.setDesiredRPM(rpm);
-
     }
 
     @Override
     public void execute(){
-        if(rpm != 0)
-            shooterSub.setDesiredRPM(rpm);
+
     }
 
     @Override
     public void end(boolean interrupted){
-        shooterSub.toggleShooter();
+
     }
 
     @Override
     public boolean isFinished(){
-        return false;
+        return true;
     }
 }

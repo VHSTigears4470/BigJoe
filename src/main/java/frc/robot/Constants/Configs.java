@@ -1,10 +1,9 @@
 package frc.robot.Constants;
 
-import java.awt.geom.Point2D;
-
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.FeedForwardConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public final class Configs {
@@ -147,18 +146,10 @@ public final class Configs {
     }
 
     public static final class Shooter {
-        public static final SparkMaxConfig FLYWHEEL_RIGHT_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig FLYWHEEL_LEFT_CONFIG = new SparkMaxConfig();
+        public static final SparkFlexConfig FLYWHEEL_RIGHT_CONFIG = new SparkFlexConfig();
+        public static final SparkFlexConfig FLYWHEEL_LEFT_CONFIG = new SparkFlexConfig();
         public static final SparkMaxConfig FEEDER_CONFIG = new SparkMaxConfig();
         public static final SparkMaxConfig HOPPER_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig FLYWHEEL_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig SECONDARY_CONFIG = new SparkMaxConfig();
-        public static final Point2D points[] = {
-            new Point2D.Double(0, 0), // placeholder values
-            new Point2D.Double(1, 1000),
-            new Point2D.Double(2, 2000),
-            new Point2D.Double(3, 3000)
-        };
 
         static {
             FLYWHEEL_RIGHT_CONFIG
@@ -168,7 +159,7 @@ public final class Configs {
                 .inverted(false); 
             FLYWHEEL_RIGHT_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .apply(new FeedForwardConfig().kV(.000207)) // ~1/MAX_RPM  .00020352
+                .apply(new FeedForwardConfig().kV(.000176)) // ~1/MAX_RPM  .00020352
                 .p(0.0002) //.00078
                 .d(0.25)//d can't be neg
                 .outputRange(-1, 1);

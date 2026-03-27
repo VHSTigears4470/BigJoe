@@ -12,14 +12,26 @@ public class IntakeSubsystem extends SubsystemBase {
     
     private final PIDMotor intakeMotor;
     private final PIDMotor rotateMotor;
+    private boolean isRetracted;
+    private boolean isRunning;
 
     public IntakeSubsystem(){
         intakeMotor = new PIDMotor(new PIDMotorIOSparkMax(IntakeConstants.INTAKE_ID, Intake.INTAKE_CONFIG));
         rotateMotor = new PIDMotor(new PIDMotorIOSparkMax(IntakeConstants.ROTATE_ID, Intake.ROTATE_CONFIG));
+        isRetracted = true;
+        isRunning = false;
     }
 
     public void setIntake(double speed) {
         intakeMotor.set(speed);
+    }
+
+    public void toggleIntake() {
+        isRunning = !isRunning;
+    }
+    
+    public boolean isRunning() {
+        return isRunning;
     }
 
     public void extend() {
@@ -27,11 +39,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void retract() {
-        rotateMotor.setSetpoint(-1.0, 0);
+        rotateMotor.setSetpoint(-3.0, 0);
     }
 
-    public void retractToShoot() {
-        rotateMotor.setSetpoint(1.5, 0);
+    public void toggleRotate() {
+        isRetracted = !isRetracted;
+    }
+
+    public boolean isRetracted(){
+        return isRetracted;
     }
 
     public void stopMotors() {
@@ -44,7 +60,8 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void periodic(){
-        Logger.recordOutput("IntakeSubsystem/Rotate Value", rotateMotor.getEncoder());
+        Logger.recordOutput("IntakeSubsystem/Is Retracted", isRetracted);
+        Logger.recordOutput("IntakeSubsystem/Rotate Value", getRotation());
         Logger.recordOutput("IntakeSubsystem/IntakeMotorRPM", intakeMotor.getRPM());
         Logger.recordOutput("IntakeSubsystem/RotateMotorRPM", rotateMotor.getRPM());
     }

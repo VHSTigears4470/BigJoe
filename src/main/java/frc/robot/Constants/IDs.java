@@ -16,8 +16,7 @@ public class IDs {
     }
 
     public static final class ClimbConstants {
-        public static final int CLIMB_LEFT_ID = 22;  //27
-        public static final int CLIMB_RIGHT_ID = 21; //26
+        public static final int CLIMB_ID = 22;  //27
         public static final int CLIMB_LIMIT_ID = 0;
     }
 
