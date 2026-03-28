@@ -137,8 +137,7 @@ public class DriveSubsystem extends SubsystemBase{
             Translation2d shooterOffsetField = shooterOffsetRobot.rotateBy(drivePose.getRotation());
             Translation2d shooterPos = drivePose.getTranslation().plus(shooterOffsetField);
             Rotation2d desiredAngle;
-            if(DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue && drivePose.getX() > 12.528
-            || DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red && drivePose.getX() < 4.00) {
+            if(onOpponentSide()) {
                 desiredAngle = new Rotation2d(Math.PI);
             } else {
                 desiredAngle = Vision.Constants.getHubPose().toPose2d().getTranslation().minus(shooterPos).getAngle();
@@ -172,6 +171,11 @@ public class DriveSubsystem extends SubsystemBase{
 
     public double getDistanceToHub(){
         return poseEstimator.getEstimatedPosition().getTranslation().getDistance(Vision.Constants.getHubPose().toPose2d().getTranslation());
+    }
+
+    public boolean onOpponentSide() {
+        return (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue && getPose().getX() > 12.528)
+            || (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red && getPose().getX() < 4.00);
     }
 
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {

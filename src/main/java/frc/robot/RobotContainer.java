@@ -95,7 +95,7 @@ public class RobotContainer {
       NamedCommands.registerCommand("ToggleDriveAligned", new DriveAlignedToggle(driveSub));
 
       PathConstraints constraints = new PathConstraints(
-          1.5, 2.0,
+          2.0, 2.0,
           Units.degreesToRadians(240),
           Units.degreesToRadians(240));
       PathPlannerPath path;
@@ -146,8 +146,8 @@ public class RobotContainer {
 
     if (Operating.Constants.USING_INTAKE) {
       intakeSub = new IntakeSubsystem();
-      NamedCommands.registerCommand("Extend", new IntakeExtend(intakeSub));
-      NamedCommands.registerCommand("Intake", new Intake(intakeSub));
+      NamedCommands.registerCommand("IntakeToggleRotate", new IntakeToggle(intakeSub));
+      NamedCommands.registerCommand("IntakeToggle", new Intake(intakeSub));
     }
 
     if (Operating.Constants.USING_SHOOTER) {
@@ -156,8 +156,6 @@ public class RobotContainer {
           //new RunCommand(() -> shooterSub.updateDesiredRPM(driveSub.getDistanceToHub()), shooterSub));
       NamedCommands.registerCommand("Shoot", new Shoot(shooterSub, 0));
       NamedCommands.registerCommand("Shoot3000", new Shoot(shooterSub, 3000));
-      if (Operating.Constants.USING_INTAKE)
-        NamedCommands.registerCommand("FeedToShoot", new FeedToShoot(shooterSub, intakeSub));
     }
 
     if (Operating.Constants.USING_CLIMB) {
@@ -182,7 +180,7 @@ public class RobotContainer {
         if (Operating.Constants.USING_SHOOTER && Operating.Constants.USING_DRIVE && Operating.Constants.USING_VISION) {
           controller.leftBumper().onTrue(new ParallelCommandGroup(
               new DriveAlignedToggle(driveSub),
-              new Shoot(shooterSub, 0)));
+              new Shoot(shooterSub, driveSub.onOpponentSide() ? 3000 : 0)));
         }
 
         if (Operating.Constants.USING_SHOOTER) {
