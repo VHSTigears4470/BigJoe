@@ -38,7 +38,9 @@ public class RobotContainer {
   private ClimbSubsystem climbSub;
   private IntakeSubsystem intakeSub;
 
-  private final CommandXboxController controller = new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
+  private final CommandXboxController driverController = new CommandXboxController(OI.Constants.DRIVE_CONTROLLER_PORT);
+  private final CommandXboxController operatorController = new CommandXboxController(OI.Constants.OPERATOR_CONTROLLER_PORT);
+
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -73,11 +75,11 @@ public class RobotContainer {
       driveSub.setDefaultCommand(new RunCommand(
           () -> {
             double y = OI.Constants.DRIVER_AXIS_Y_INVERTED * MathUtil
-                .applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND);
+                .applyDeadband(driverController.getRawAxis(OI.Constants.DRIVER_AXIS_Y), OI.Constants.DRIVE_DEADBAND);
             double x = OI.Constants.DRIVER_AXIS_X_INVERTED * MathUtil
-                .applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND);
+                .applyDeadband(driverController.getRawAxis(OI.Constants.DRIVER_AXIS_X), OI.Constants.DRIVE_DEADBAND);
             double rot = OI.Constants.DRIVER_AXIS_ROT_INVERTED * MathUtil
-                .applyDeadband(controller.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND);
+                .applyDeadband(driverController.getRawAxis(OI.Constants.DRIVER_AXIS_ROT), OI.Constants.DRIVE_DEADBAND);
 
             // Add logging for buttons
 
@@ -85,8 +87,8 @@ public class RobotContainer {
             Logger.recordOutput("Operator/Drive/Y", y);
             Logger.recordOutput("Operator/Drive/X", x);
             Logger.recordOutput("Operator/Drive/Rot", rot);
-            Logger.recordOutput("Operator/Drive/LeftTrigger", controller.leftTrigger().getAsBoolean());
-            Logger.recordOutput("Operator/Drive/RightTrigger", controller.rightTrigger().getAsBoolean());
+            Logger.recordOutput("Operator/Drive/LeftTrigger", driverController.leftTrigger().getAsBoolean());
+            Logger.recordOutput("Operator/Drive/RightTrigger", driverController.rightTrigger().getAsBoolean());
 
             driveSub.drive(y, x, rot, true, "Default / Field Oriented");
           },
@@ -172,29 +174,41 @@ public class RobotContainer {
     switch (preset) {
       default:
         if (Operating.Constants.USING_CLIMB) {
-          controller.povUp().onTrue(new ClimbExtend(climbSub));
-          controller.povDown().onTrue(new ClimbRetract(climbSub));
-          controller.povRight().onTrue(new ClimbZero(climbSub));
+          driverController.povUp().onTrue(new ClimbExtend(climbSub));
+          driverController.povDown().onTrue(new ClimbRetract(climbSub));
+          driverController.povRight().onTrue(new ClimbZero(climbSub));
         }
 
         if (Operating.Constants.USING_SHOOTER && Operating.Constants.USING_DRIVE && Operating.Constants.USING_VISION) {
-          controller.leftBumper().onTrue(new ParallelCommandGroup(
+          driverController.leftBumper().onTrue(new ParallelCommandGroup(
               new DriveAlignedToggle(driveSub),
               new Shoot(shooterSub, driveSub.onOpponentSide() ? 3000 : 0)));
         }
 
         if (Operating.Constants.USING_SHOOTER) {
-          controller.x().onTrue(new Shoot(shooterSub, 2250));
-          controller.rightBumper().onTrue(new Shoot(shooterSub, 3200));
+          driverController.x().onTrue(new Shoot(shooterSub, 2250));
+          driverController.rightBumper().onTrue(new Shoot(shooterSub, 3200));
         }
 
         if (Operating.Constants.USING_INTAKE && Operating.Constants.USING_SHOOTER) {
-          controller.leftTrigger().whileTrue(new FeedToShoot(shooterSub, intakeSub));
+          driverController.leftTrigger().whileTrue(new FeedToShoot(shooterSub, intakeSub));
         }
 
         if (Operating.Constants.USING_INTAKE) {
-          controller.b().onTrue(new IntakeToggle(intakeSub));
-          controller.rightTrigger().onTrue(new Intake(intakeSub));
+          driverController.b().onTrue(new IntakeToggle(intakeSub));
+          driverController.rightTrigger().onTrue(new Intake(intakeSub));
+        }
+
+        if(Operating.Constants.USING_OPERATOR && Operating.Constants.USING_SHOOTER) {
+          operatorController.x().onTrue(new Shoot(shooterSub, 2000));
+          operatorController.y().onTrue(new Shoot(shooterSub, 2150));
+          operatorController.b().onTrue(new Shoot(shooterSub, 2300));
+          operatorController.a().onTrue(new Shoot(shooterSub, 2450));
+          operatorController.povLeft().onTrue(new Shoot(shooterSub, 2600));
+          operatorController.povUp().onTrue(new Shoot(shooterSub, 2750));
+          operatorController.povRight().onTrue(new Shoot(shooterSub, 2900));
+          operatorController.povDown().onTrue(new Shoot(shooterSub, 3050));
+
         }
 
         break;

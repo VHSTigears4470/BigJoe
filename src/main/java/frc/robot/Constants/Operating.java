@@ -8,6 +8,7 @@ public class Operating {
         public static final boolean USING_SHOOTER = true;
         public static final boolean USING_CLIMB = true;
         public static final boolean USING_INTAKE = true;
+        public static final boolean USING_OPERATOR = false;
     }
     public static final class Debugging {
         public static final boolean DRIVE_DEBUG = false; //redundant
